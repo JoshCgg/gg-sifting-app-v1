@@ -203,27 +203,27 @@ body{background:#0f1e2d;color:#e8f0f8}
     <div class="sc"><div class="sv" id="stat-prayer">0</div><div class="sk">Prayer</div></div>
     <div class="sc"><div class="sv" id="stat-salvation">0</div><div class="sk">Decisions</div></div>
   </div>
-  <div class="sl">Navigate</div>
+ <div class="sl">What would you like to do?</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-    <button onclick="switchTab('resources')" style="background:var(--gbj);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">📚</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px">Resources</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Tools &amp; training</span>
+    <button onclick="switchTab('resources')" style="background:var(--gi);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <span style="font-size:32px;line-height:1">📖</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Prepare</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Pre-trip &amp; training</span>
     </button>
-    <button onclick="switchTab('log')" style="background:var(--go);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">📋</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px">Log Contact</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">New encounter</span>
+    <button onclick="switchTab('resources')" style="background:var(--gbl);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <span style="font-size:32px;line-height:1">🙏</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Pray</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Prayer &amp; walking guides</span>
     </button>
-    <button onclick="switchTab('daily')" style="background:var(--gi);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">📊</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px">Daily Tally</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Submit counts</span>
+    <button onclick="switchTab('resources')" style="background:var(--go);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <span style="font-size:32px;line-height:1">💬</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Share</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Gospel &amp; culture tips</span>
     </button>
-    <button onclick="switchTab('summary');buildSummary()" style="background:var(--gbl);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">📈</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px">Summary</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Week report</span>
+    <button onclick="switchTab('summary');buildSummary()" style="background:var(--gbj);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <span style="font-size:32px;line-height:1">🎉</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Celebrate</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Tracking &amp; reports</span>
     </button>
   </div>
   <div class="sl">Daily Checklist</div>
