@@ -27,10 +27,6 @@ body{font-family:'Montserrat',sans-serif;background:var(--gg);color:var(--gi);mi
 .main{padding:20px 16px 90px;max-width:600px;margin:0 auto}
 .screen{display:none}
 .screen.active{display:block}
-.back-bar{display:flex;align-items:center;gap:10px;background:var(--gbj);border-radius:var(--r);padding:12px 16px;margin-bottom:20px;cursor:pointer;transition:filter .1s}
-.back-bar:active{filter:brightness(.9)}
-.back-bar-label{font-size:13px;font-weight:700;color:#fff;letter-spacing:.3px}
-.back-bar-sub{font-size:10px;color:rgba(255,255,255,.8);font-weight:500;margin-top:1px}
 .sl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--gi);opacity:.5;margin:24px 0 10px}
 .sl:first-child{margin-top:0}
 .card{background:#fff;border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:var(--sh)}
@@ -143,9 +139,30 @@ body{font-family:'Montserrat',sans-serif;background:var(--gg);color:var(--gi);mi
 .uu{background:#ffebee;color:#c62828}
 .uv{background:#fff3e0;color:#e65100}
 .uc{background:#fff8e1;color:#f57f17}
-.sec-hdr{border-radius:14px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
-.sec-hdr-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff}
-.sec-hdr-sub{font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(255,255,255,.75);font-weight:500}
+/* ── Code word entry screen ── */
+#cw-screen{position:fixed;inset:0;background:var(--gi);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;transition:opacity .4s}
+#cw-screen.hide{opacity:0;pointer-events:none}
+.cw-logo{width:64px;height:64px;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--gi);margin-bottom:20px}
+.cw-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:6px;text-align:center}
+.cw-sub{font-family:'Libre Baskerville',serif;font-style:italic;font-size:14px;color:rgba(236,241,238,.65);margin-bottom:36px;text-align:center;line-height:1.5}
+.cw-input-wrap{width:100%;max-width:360px;margin-bottom:12px}
+.cw-input{width:100%;padding:16px 18px;border:2px solid rgba(255,255,255,.2);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;font-family:'Montserrat',sans-serif;font-size:20px;font-weight:700;letter-spacing:.12em;text-align:center;text-transform:uppercase;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.cw-input::placeholder{color:rgba(255,255,255,.3);letter-spacing:.05em;font-size:15px;font-weight:500}
+.cw-input:focus{border-color:var(--gbj)}
+.cw-btn{width:100%;max-width:360px;padding:16px;background:var(--go);border:none;border-radius:14px;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:.5px;transition:background .15s,transform .1s}
+.cw-btn:active{transform:scale(.98)}
+.cw-btn:disabled{background:#7a9ab0;cursor:not-allowed}
+.cw-error{color:#ff9a94;font-size:13px;font-weight:600;margin-top:12px;text-align:center;min-height:20px}
+.cw-loading{display:flex;align-items:center;gap:10px;color:rgba(236,241,238,.7);font-size:14px;font-weight:600;margin-top:16px}
+.cw-spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.cw-change{margin-top:24px;font-size:12px;color:rgba(236,241,238,.4);text-align:center;cursor:pointer;text-decoration:underline}
+
+/* ── Firestore sync indicator ── */
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#4caf50;display:inline-block;margin-right:5px}
+.sync-dot.off{background:#f44336}
+.sync-dot.pending{background:var(--go)}
+
 @media(prefers-color-scheme:dark){
 body{background:#0f1e2d;color:#e8f0f8}
 .topnav{background:#0a1520}
@@ -175,6 +192,22 @@ body{background:#0f1e2d;color:#e8f0f8}
 </head>
 <body>
 
+<!-- CODE WORD ENTRY SCREEN -->
+<div id="cw-screen">
+  <div class="cw-logo">GG</div>
+  <div class="cw-title">Welcome to<br>Sifting Week</div>
+  <div class="cw-sub">Enter the code word your<br>team leader gave you</div>
+  <div class="cw-input-wrap">
+    <input class="cw-input" id="cw-input" type="text" placeholder="e.g. BEACON26" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false" />
+  </div>
+  <button class="cw-btn" id="cw-btn">Let's Go →</button>
+  <div class="cw-error" id="cw-error"></div>
+  <div class="cw-loading" id="cw-loading" style="display:none">
+    <div class="cw-spinner"></div>
+    Looking up your week…
+  </div>
+</div>
+
 <div class="topnav">
   <div class="topnav-brand">
     <div class="gg-logo">GG</div>
@@ -184,6 +217,7 @@ body{background:#0f1e2d;color:#e8f0f8}
     </div>
   </div>
   <div class="week-badge" onclick="openWeekModal()">
+    <span class="sync-dot" id="sync-dot"></span>
     <svg width="12" height="12" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     <span id="nav-week-code">Week</span>
   </div>
@@ -210,27 +244,27 @@ body{background:#0f1e2d;color:#e8f0f8}
     <div class="sc"><div class="sv" id="stat-prayer">0</div><div class="sk">Prayer</div></div>
     <div class="sc"><div class="sv" id="stat-salvation">0</div><div class="sk">Decisions</div></div>
   </div>
-  <div class="sl">What would you like to do?</div>
+  <div class="sl">Navigate</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-    <button onclick="switchTab('prepare')" style="background:var(--gi);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">📖</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Prepare</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Pre-trip &amp; training</span>
+    <button onclick="switchTab('resources')" style="background:var(--gbj);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <span style="font-size:32px;line-height:1">📚</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px">Resources</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Tools &amp; training</span>
     </button>
-    <button onclick="switchTab('pray')" style="background:var(--gbl);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">🙏</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Pray</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Prayer &amp; walking guides</span>
+    <button onclick="switchTab('log')" style="background:var(--go);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <span style="font-size:32px;line-height:1">📋</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px">Log Contact</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">New encounter</span>
     </button>
-    <button onclick="switchTab('share')" style="background:var(--go);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">💬</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Share</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Gospel &amp; culture tips</span>
+    <button onclick="switchTab('daily')" style="background:var(--gi);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <span style="font-size:32px;line-height:1">📊</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px">Daily Tally</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Submit counts</span>
     </button>
-    <button onclick="switchTab('celebrate')" style="background:var(--gbj);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">🎉</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Celebrate</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Tracking &amp; reports</span>
+    <button onclick="switchTab('summary');buildSummary()" style="background:var(--gbl);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:transform .1s,filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <span style="font-size:32px;line-height:1">📈</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px">Summary</span>
+      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Week report</span>
     </button>
   </div>
   <div class="sl">Daily Checklist</div>
@@ -244,284 +278,60 @@ body{background:#0f1e2d;color:#e8f0f8}
   </div>
 </div>
 
-<!-- PREPARE -->
-<div class="screen" id="screen-prepare">
-  <div class="sec-hdr" style="background:var(--gi)">
-    <span style="font-size:28px">📖</span>
-    <div><div class="sec-hdr-title">Prepare</div><div class="sec-hdr-sub">All 4 pre-trip modules</div></div>
-  </div>
-  <div class="rc i" onclick="toggleRC(this)">
-    <div class="rc-icon">🌍</div><div class="rc-title">Module 1 — Vision &amp; Foundations</div>
-    <div class="rc-desc">Why we go · Gateway cities · GG's strategy</div>
-    <div class="rc-body">
-      <h4>Why Does Missions Happen?</h4>
-      <p>The fact that God's name is not praised in every land among every people is an injustice against God. Missions isn't about getting a great praise report — it's about joining God on His mission to make His glory known to all people. It's not about us, our plans, our goals, our name. It's about Him.</p>
-      <div class="scr">"God is most glorified in you when you are most satisfied in Him." — John Piper</div>
-      <h4>Missions Exists Because Worship Doesn't</h4>
-      <p>The ultimate goal of the church is the glory of God. Missions is penultimate — worship is ultimate. World evangelization is the pathway to maximum joy and maximum worship. When the kingdom finally comes in glory, missions will cease.</p>
-      <h4>Why Gateway Cities?</h4>
-      <ul>
-        <li>By 2030, over 75% of the world's population will live in major cities</li>
-        <li>Cities are influential centers — ministry here goes beyond city borders into the world</li>
-        <li>Being away from home, diaspora peoples are often more receptive to the Gospel</li>
-        <li>A person reached here can carry the Gospel back to their home country</li>
-      </ul>
-      <h4>GG's 4 Goals for Short-Term Teams</h4>
-      <ul>
-        <li>🙏 <strong>Prayer</strong> — Cover our areas in prayer; battle for hearts and minds</li>
-        <li>📢 <strong>Gospel Saturation</strong> — Sow the gospel broadly in a biblically and culturally appropriate way</li>
-        <li>🕊️ <strong>Find Persons of Peace</strong> — Locate those ready to receive Jesus and reach their community</li>
-        <li>🤝 <strong>Build Goodwill</strong> — Discern spiritual state of individuals; connect them to long-term workers</li>
-      </ul>
-      <div class="scr">"So neither he who plants nor he who waters is anything, but only God who gives the growth." — 1 Corinthians 3:7</div>
-    </div>
-  </div>
-  <div class="rc" onclick="toggleRC(this)">
-    <div class="rc-icon">🛡️</div><div class="rc-title">Module 2 — Spiritual Preparation</div>
-    <div class="rc-desc">Prayer is the beginning, middle, and end of any meaningful trip</div>
-    <div class="rc-body">
-      <div class="scr">"Prayer is the beginning, middle, and end of any meaningful short-term trip. If you don't intend to pray, don't plan to come."</div>
-      <h4>Before You Go Out Each Day</h4>
-      <ul>
-        <li>Spend time in personal prayer and Scripture — don't skip quiet time</li>
-        <li>Confess anything that might hinder the Spirit's work through you</li>
-        <li>Ask God to fill you afresh — not your skill, but His power</li>
-        <li>Pray with your team before leaving; lay hands on each person in groups of 3</li>
-      </ul>
-      <h4>What to Surrender</h4>
-      <ul>
-        <li>Results are God's job — your job is faithfulness</li>
-        <li>Many teams spend weeks planning logistics but little time preparing spiritually, then wonder why God's voice is unclear</li>
-        <li>Ministry among least-reached peoples requires a redefinition of what missions is about</li>
-        <li>A lack of spiritual boldness is a sign of not operating in the Holy Spirit's power</li>
-      </ul>
-      <h4>Build a Prayer Team at Home</h4>
-      <p>Commit yourself to developing a team of prayer partners who will pray daily for you while you are here. The work depends on it.</p>
-      <div class="scr">"The harvest is plentiful but the workers are few. Ask the Lord of the harvest to send out workers into his harvest field." — Matthew 9:37–38</div>
-    </div>
-  </div>
-  <div class="rc" onclick="toggleRC(this)">
-    <div class="rc-icon">📅</div><div class="rc-title">12-Day Prayer Guide</div>
-    <div class="rc-desc">Daily prayer focus — start before the trip, continue through it</div>
-    <div class="rc-body" id="prayer-guide-container"></div>
-  </div>
-  <div class="rc o" onclick="toggleRC(this)">
-    <div class="rc-icon">📝</div><div class="rc-title">Module 3 — My Story &amp; His Story</div>
-    <div class="rc-desc">Prepare your testimony · Learn the Korban tool</div>
-    <div class="rc-body">
-      <div class="scr">"Our job is not to save people, but to expose them to the power of the Gospel so the Holy Spirit can convict them of sin and show them the way of salvation."</div>
-      <h4>Telling My Story — Prepare Your Testimony</h4>
-      <p>Read John 4:4–42. Notice how God used the Samaritan woman's simple testimony as a bridge to point her people to Jesus. This is our goal — introducing people to Jesus and helping them discover God's Word for themselves.</p>
-      <p>Your testimony should have <strong>one key adjective</strong> describing who you were before Jesus, and <strong>one key adjective</strong> describing what changed. Keep it to around <strong>60 seconds</strong>. Make sure it's relevant to people who are not from a Christian background.</p>
-      <h4>Your Testimony Framework</h4>
-      <ul>
-        <li>✏️ <strong>My life before Jesus:</strong> (one honest adjective + brief story)</li>
-        <li>✏️ <strong>How I met Jesus:</strong> (keep it simple — what happened?)</li>
-        <li>✏️ <strong>How my life has changed:</strong> (one adjective + what's different now)</li>
-      </ul>
-      <p style="font-size:12px;color:#7a8fa0;font-style:italic">If you were saved very young, share a testimony of a time God intervened in your life and changed things for you.</p>
-      <h4>Telling His Story — The Korban (Sacrifice) Tool</h4>
-      <p>Korban is a powerful way to sift for Persons of Peace within Muslim communities. It uses the concept of sacrifice — deeply familiar in Islamic culture — as a bridge to the cross.</p>
-      <p>📺 Watch the example video before your trip: <strong>youtube.com/watch?v=eB3XwF33v3Q</strong></p>
-      <div class="scr">"Korbani" — Sacrifice. This single word opens doors with Muslims that few other words can.</div>
-      <h4>Key Bridge Words to Learn</h4>
-      <ul>
-        <li>🕌 <strong>Assalamu Alaikum</strong> — Peace be upon you (Arabic/Urdu greeting)</li>
-        <li>🇧🇩 <strong>Kemon achen</strong> — How are you? (Bengali)</li>
-        <li>🙏 <strong>Namaste</strong> — Greeting (Hindi/Nepali)</li>
-        <li>✝️ <strong>Isa Al Masih</strong> — Jesus the Messiah (use instead of "Jesus")</li>
-        <li>🐑 <strong>Korbani</strong> — Sacrifice (the bridge to the cross)</li>
-      </ul>
-      <h4>Practice Assignment</h4>
-      <p>Before your next team meeting, share your testimony and the Korban story with someone who is not yet a Christian. Come ready to debrief.</p>
-    </div>
-  </div>
-  <div class="rc i" onclick="toggleRC(this)">
-    <div class="rc-icon">🕌</div><div class="rc-title">Module 4 — Intro to Islam &amp; Cultural Tips</div>
-    <div class="rc-desc">What Muslims believe · How to engage respectfully</div>
-    <div class="rc-body">
-      <h4>The Five Pillars of Islam</h4>
-      <ul>
-        <li><strong>Shahada</strong> — "There is no God but Allah and Muhammad is His prophet" — recited at birth and death</li>
-        <li><strong>Salat</strong> — Ritual prayer 5 times daily facing Mecca (dawn, midday, mid-afternoon, sunset, two hours after sunset)</li>
-        <li><strong>Sawm</strong> — Fasting during Ramadan from sunrise to sunset</li>
-        <li><strong>Zakat</strong> — Giving 2.5% of accumulated wealth annually to the poor or mosque</li>
-        <li><strong>Hajj</strong> — Pilgrimage to Mecca at least once in a lifetime</li>
-      </ul>
-      <h4>Key Doctrines to Understand</h4>
-      <ul>
-        <li>Allah is absolute and has no partners — avoid "Son of God" language initially</li>
-        <li>Isa (Jesus) is honored as a prophet, Messiah, Word of Allah, and Spirit of Allah — 97 references in the Qur'an</li>
-        <li>Muslims believe the Bible has been corrupted — use "Injil" (Gospel) language; don't argue this point</li>
-        <li>Destiny (Insya-Allah / "If God wills") — everything is in Allah's hands; compare James 4:13–15</li>
-        <li>Good deeds must outweigh bad for Paradise — they have no assurance of salvation</li>
-      </ul>
-      <h4>Bridge Points for Conversation</h4>
-      <ul>
-        <li><strong>Start with Isa Al Masih</strong> — Muslims deeply respect Isa; beginning here opens hearts</li>
-        <li><strong>Use Korbani</strong> — The sacrifice concept powerfully connects to the cross</li>
-        <li>Opening question: <em>"What do you think about Isa Al Masih?"</em></li>
-        <li>The Qur'an affirms Isa was born of a virgin, performed miracles, and will return — build from there</li>
-      </ul>
-      <h4>Cultural Tips — Relating Well</h4>
-      <ul>
-        <li>Muslims value <strong>hospitality over schedules</strong> — be flexible and unhurried</li>
-        <li>Use <strong>"Selam"</strong> or <strong>"Assalamu Alaikum"</strong> as a greeting — they will light up</li>
-        <li>Remove shoes when entering a home if they do</li>
-        <li>Accept offered tea or food — refusing can offend deeply</li>
-        <li>Touching/handshakes are typically same-sex only; don't offer your hand to the opposite gender first</li>
-        <li>Be careful laying hands on Muslims while praying — ask permission first; some find it offensive</li>
-        <li>Don't press conversation during prayer times (5 daily)</li>
-        <li><strong>Men primarily with men; women with women</strong></li>
-      </ul>
-    </div>
-  </div>
-</div>
-
-<!-- PRAY -->
-<div class="screen" id="screen-pray">
-  <div class="sec-hdr" style="background:var(--gbl)">
-    <span style="font-size:28px">🙏</span>
-    <div><div class="sec-hdr-title">Pray</div><div class="sec-hdr-sub">Prayer walking &amp; spiritual power</div></div>
-  </div>
-  <div class="rc" onclick="toggleRC(this)">
-    <div class="rc-icon">🚶</div><div class="rc-title">Prayer Walking Guide</div>
-    <div class="rc-desc">Praying on-site with insight for your specific area</div>
-    <div class="rc-body">
-      <div class="scr">"Prayer walking is praying on-site with insight for specific areas around you, and covering these areas with God's presence as you walk."</div>
-      <h4>Why Walk While You Pray?</h4>
-      <ul>
-        <li>Walking physically integrates you in a place — you begin to pray with your whole body, not just your mind</li>
-        <li>Being there makes you aware of specific things to pray for that you'd never think of at home</li>
-        <li>Walking is an act of confidence in God's power over a situation</li>
-        <li>Your presence itself is a witness — people notice that someone cares enough to show up</li>
-      </ul>
-      <h4>Before You Go Out</h4>
-      <ul>
-        <li>Begin with worship — dedicate yourself and the next few hours to God</li>
-        <li>Read a passage to focus your attention on what you're about to do</li>
-        <li>Be quiet before God and listen — tune yourself to His voice</li>
-        <li>Resolve any team tensions before you start — effective prayer is compromised by team conflict</li>
-      </ul>
-      <h4>Organizing the Walk</h4>
-      <ul>
-        <li>Divide into groups of 2–3 — enough for agreement, not so many that some can't participate</li>
-        <li>Split up experienced prayer walkers between groups</li>
-        <li>Decide on a route; be flexible with timing — 1–2 hours is a good start</li>
-        <li>Balance three elements: <strong>worship · spiritual warfare · welcoming Christ</strong></li>
-      </ul>
-      <h4>What to Pray</h4>
-      <ul>
-        <li>Spiritual breakthrough in every home on every street</li>
-        <li>Salvations — pray for people by name when you know them</li>
-        <li>For Persons of Peace — ask God to highlight them to you</li>
-        <li>Against spiritual darkness — that bondage be broken</li>
-        <li>For laborers — more long-term workers for this harvest</li>
-      </ul>
-      <h4>If Asked What You're Doing</h4>
-      <p><em>"We're praying blessings over the neighborhood — can we pray for you?"</em></p>
-      <p>Note where prayer feels heavy or blocked — report it to your team leader. Take breaks — this is spiritually exhausting work.</p>
-    </div>
-  </div>
-  <div class="rc o" onclick="toggleRC(this)">
-    <div class="rc-icon">⚡</div><div class="rc-title">Holy Spirit's Power — John 14:12</div>
-    <div class="rc-desc">Why you can do greater things than you think</div>
-    <div class="rc-body">
-      <div class="scr">"Whoever believes in me will also do the works that I do; and greater works than these will he do, because I am going to the Father." — John 14:12</div>
-      <h4>Knowledge vs. Power</h4>
-      <p>The apostles had 3½ years with Jesus — knowledge of Him — but at the crucifixion they all deserted Him. They had knowledge but not His power. Something had to change.</p>
-      <p>In Acts 1, God sent the Holy Spirit. When Jesus went to heaven, God put His Spirit inside every believer. We can now be "little Christs" — carrying His presence, doing His works.</p>
-      <h4>Peter Before and After Pentecost</h4>
-      <p>In the Garden of Gethsemane, Peter denied Christ three times. A few months later, that same Peter stood and boldly proclaimed Jesus to thousands. Was the situation less dangerous? No. The Spirit had come.</p>
-      <div class="scr">"A lack of spiritual boldness is a sign that we are not operating in the power of the Holy Spirit."</div>
-      <h4>Be Filled Daily</h4>
-      <p>This isn't a one-time experience. You need to be filled with the Holy Spirit every day. Without Him, you will quickly get discouraged and stop serving.</p>
-      <div class="scr">"Do not be drunk with wine... but be filled with the Spirit." — Ephesians 5:18</div>
-      <h4>Pre-Outreach Prayer</h4>
-      <p>Break into groups of 3. Take turns laying hands on each person. Ask God to fill them so that when they speak today, their words carry the very authority of God.</p>
-    </div>
-  </div>
-</div>
-
-<!-- SHARE -->
-<div class="screen" id="screen-share">
-  <div class="sec-hdr" style="background:var(--go)">
-    <span style="font-size:28px">💬</span>
-    <div><div class="sec-hdr-title">Share</div><div class="sec-hdr-sub">Gospel tools · Discipleship · Quick references</div></div>
-  </div>
+<!-- RESOURCES -->
+<div class="screen" id="screen-resources">
+  <div class="sl">Evangelism Tools</div>
   <div class="rc" onclick="toggleRC(this)">
     <div class="rc-icon">✝️</div><div class="rc-title">3 Circles Gospel Presentation</div>
     <div class="rc-desc">Visual gospel tool that crosses language barriers</div>
     <div class="rc-body">
       <h4>How to Begin</h4>
-      <p><em>"Can I share with you a picture of how God met my greatest need?"</em> Draw as you talk. No paper? Draw in the air or on your hand.</p>
+      <p>Ask: <em>"Can I share with you a picture of how God met my greatest need?"</em> Draw as you talk.</p>
       <h4>Circle 1 — God's Perfect Design</h4>
-      <p>Draw a circle. God created everything good — us, relationships, the world. This is where we were made to live.</p>
+      <p>Draw a circle. God created everything good — us, relationships, the world.</p>
       <h4>Circle 2 — Sin → Brokenness</h4>
-      <p>Draw an arrow out, then a jagged broken circle. Everywhere we look we see brokenness. We try to escape it on our own — but we can't get back.</p>
+      <p>Draw an arrow out, then a jagged broken circle. We try to escape brokenness on our own — but we can't get back.</p>
       <h4>The Cross — Jesus (Isa Al Masih / Korbani)</h4>
-      <ul>
-        <li>Jesus (God's Spirit and God's Word) came to earth — perfect life, no sin</li>
-        <li>Died as Korbani — sacrifice — to pay for the sin and brokenness of the world</li>
-        <li>Rose 3 days later and returned to heaven</li>
-      </ul>
-      <div class="scr">"If we TURN from sin and BELIEVE in Jesus, through Him we are restored to God's Perfect Design." — Romans 10:9</div>
+      <div class="scr">"If we TURN from sin and BELIEVE in Jesus... through Him we are restored to God's perfect design." — Romans 10:9</div>
+      <p>Jesus lived a perfect life, died as Korbani (sacrifice) for our sin, rose 3 days later. Draw a cross. Arrow back to God's design.</p>
       <h4>The Three Responses</h4>
       <ul>
-        <li>🟢 <strong>Green — Believed:</strong> Pray together immediately. Begin 411 discipleship. Call team leader.</li>
-        <li>🟡 <strong>Yellow — Open:</strong> Schedule follow-up. Give Jesus film. Note their address and contact info.</li>
-        <li>🔴 <strong>Red — Not ready:</strong> Offer prayer. Leave film. Keep relationship warm. Move on and keep searching.</li>
+        <li>🟢 <strong>Green — Believed:</strong> Pray together. Immediately begin 411 discipleship.</li>
+        <li>🟡 <strong>Yellow — Open:</strong> Schedule follow-up. Give Jesus film. Note their address.</li>
+        <li>🔴 <strong>Red — Not ready:</strong> Offer prayer. Leave film. Keep relationship warm. Move on.</li>
       </ul>
-      <p>You will offer a Jesus film to everyone you meet as a parting gift.</p>
+      <h4>Key Bridge Phrases by Language</h4>
+      <ul>
+        <li>🕌 <strong>Assalamu Alaikum</strong> — Peace be upon you (Arabic/Urdu)</li>
+        <li>🇧🇩 <strong>Kemon achen</strong> — How are you? (Bengali)</li>
+        <li>🙏 <strong>Namaste</strong> — Greeting (Hindi/Nepali)</li>
+        <li>✝️ <strong>Isa Al Masih</strong> — Jesus the Messiah</li>
+        <li>🐑 <strong>Korbani</strong> — Sacrifice (powerful bridge to the cross)</li>
+      </ul>
     </div>
   </div>
   <div class="rc o" onclick="toggleRC(this)">
-    <div class="rc-icon">🐑</div><div class="rc-title">Korban Quick Reference</div>
-    <div class="rc-desc">Field card for the sacrifice bridge — use with Muslim neighbors</div>
-    <div class="rc-body">
-      <div class="scr">"Korbani" — Sacrifice. This concept is deeply embedded in Islamic culture and powerfully bridges to the cross.</div>
-      <h4>The Bridge in One Sentence</h4>
-      <p>Muslims understand and deeply value sacrifice (Korbani). Eid al-Adha — the Festival of Sacrifice — commemorates Ibrahim's willingness to sacrifice his son. Use this shared concept to introduce Jesus as God's ultimate Korbani.</p>
-      <h4>Opening the Conversation</h4>
-      <ul>
-        <li><em>"What do you think about Isa Al Masih?"</em></li>
-        <li><em>"Have you heard of Korbani — the idea of a perfect sacrifice for sin?"</em></li>
-        <li><em>"Can I show you something about Isa from the Injil (Gospel)?"</em></li>
-      </ul>
-      <h4>Key Points to Cover</h4>
-      <ul>
-        <li>God requires a sacrifice for sin — this is in the Taurat (Torah) and Injil (Gospel)</li>
-        <li>Every animal sacrifice pointed forward to the one perfect Korbani</li>
-        <li>Isa Al Masih is that Korbani — sinless, chosen by God, raised from death</li>
-        <li>Through Isa's Korbani, we can be forgiven and restored to God</li>
-      </ul>
-      <div class="scr">"Behold, the Lamb of God, who takes away the sin of the world!" — John 1:29</div>
-    </div>
-  </div>
-  <div class="rc i" onclick="toggleRC(this)">
     <div class="rc-icon">🏠</div><div class="rc-title">House of Peace Search — Luke 10</div>
     <div class="rc-desc">Finding Persons of Peace door-to-door</div>
     <div class="rc-body">
       <div class="scr">"Whatever house you enter, first say 'Peace be to this house!'" — Luke 10:5</div>
-      <h4>Suggested Script</h4>
-      <ul>
-        <li><strong>Introduce:</strong> <em>"Hi, I'm _______ and this is my friend _______"</em></li>
-        <li><strong>Care:</strong> <em>"...and we're out serving our community by asking God to bless this neighborhood and provide for people's needs."</em></li>
-        <li><strong>Ask:</strong> <em>"Is there anything we can pray for you and your family?"</em></li>
-        <li><strong>Listen.</strong> Then respond based on their answer.</li>
-      </ul>
-      <h4>If YES — Pray, Then Transition</h4>
-      <p><em>"God, thank you that you love [name] and care for their needs. We pray in Jesus' name that you would bless this family by revealing yourself to them in a very special way..."</em> Then: <em>"Thank you for letting us pray for you. I'm curious — are you religious?"</em> → Continue to Gospel.</p>
-      <h4>If NO — Gently Transition</h4>
-      <p><em>"Ok. Are you sure? Are you not religious at all?"</em> → Try to move to Gospel dialogue. If they close the door, thank them and move on.</p>
+      <h4>Your Opening Line</h4>
+      <p><em>"Hi, we're volunteers praying blessings over families in the neighborhood. Could we offer a prayer for your home?"</em></p>
       <h4>Three Signs of a Person of Peace</h4>
       <ul>
         <li>✅ <strong>Accepts the Messenger</strong> — welcomes you warmly</li>
         <li>✅ <strong>Accepts the Message</strong> — receptive to what you share</li>
         <li>✅ <strong>Accepts the Mission</strong> — wants others in their community to know</li>
       </ul>
-      <h4>When You Find One</h4>
-      <p>Call your team leader immediately. Stay and invest — the Person of Peace gathers their own community. Don't move on too fast. Schedule a Bible study. Bring a local believer if possible.</p>
+      <h4>Your Responsibility</h4>
+      <ul>
+        <li><strong>Pray</strong> for laborers before you go out</li>
+        <li><strong>Go</strong> and find the Person of Peace</li>
+        <li>When found: <strong>STAY and invest</strong> — the POP gathers their own community</li>
+        <li>No POP found: <strong>leave and keep searching</strong></li>
+      </ul>
+      <h4>If Someone Is Very Open</h4>
+      <p>Call your team leader immediately. Schedule Bible study. Bring a local believer if possible.</p>
       <h4>3 P's When You Enter a Home</h4>
       <ul>
         <li>⚡ <strong>Power</strong> — Pray in the authority of Jesus</li>
@@ -530,82 +340,99 @@ body{background:#0f1e2d;color:#e8f0f8}
       </ul>
     </div>
   </div>
-  <div class="rc" onclick="toggleRC(this)">
+  <div class="rc i" onclick="toggleRC(this)">
     <div class="rc-icon">📖</div><div class="rc-title">411 Discipleship Tool</div>
     <div class="rc-desc">4 questions · 1 paper · 1 hour — for new disciples</div>
     <div class="rc-body">
       <div class="scr">"Go therefore and make disciples of all nations..." — Matthew 28:19</div>
       <h4>The 4 Questions</h4>
       <ul>
-        <li>❓ <strong>WHY?</strong> Your identity as Ambassador — making disciples isn't just what you do, it's who you are (2 Cor. 5:17–21)</li>
-        <li>👤 <strong>WHO?</strong> Persons of Peace + your Oikos (household network)</li>
-        <li>💬 <strong>WHAT?</strong> The 3 Circles gospel presentation</li>
-        <li>📅 <strong>WHEN?</strong> Specific calendar goals before they leave</li>
+        <li>❓ <strong>WHY?</strong> Your identity as Ambassador (2 Cor. 5:17–21)</li>
+        <li>👤 <strong>WHO?</strong> Persons of Peace + your Oikos network</li>
+        <li>💬 <strong>WHAT?</strong> The 3 Circles gospel</li>
+        <li>📅 <strong>WHEN?</strong> Specific calendar goals set before they leave</li>
       </ul>
       <h4>Oikos Map (WHO? Part 2)</h4>
-      <p>Draw a circle with the person's name in the center. Map relationships far from God — go out 4 generations. This becomes their personal prayer and evangelism strategy. Pray for these people by name right now.</p>
-      <h4>4 WHEN? Goals to Set Before They Leave</h4>
+      <p>Draw a circle with the person's name. Map relationships far from God — 4 generations out. This becomes their personal prayer and evangelism strategy.</p>
+      <h4>4 WHEN? Goals to Set</h4>
       <ul>
-        <li>📆 <strong>PRAY</strong> — Daily time to pray for their Oikos (set a specific time)</li>
-        <li>👋 <strong>SHARE</strong> — One person from their Oikos to share the gospel with this week (name + day/time)</li>
-        <li>🎓 <strong>TRAIN</strong> — When will they train someone else in 411?</li>
-        <li>🚀 <strong>START</strong> — First Commands of Christ meeting at obeychrist.com (When? Where? Who else?)</li>
-      </ul>
-      <h4>If Someone Believes — Do This Immediately</h4>
-      <ul>
-        <li>Pray together right then</li>
-        <li>Begin 411 on the spot — don't wait</li>
-        <li>Schedule your next meeting before you leave them</li>
-        <li>Call your team leader</li>
+        <li>Daily time to <strong>PRAY</strong> for their oikos</li>
+        <li>Name someone to <strong>SHARE</strong> gospel with this week</li>
+        <li>Schedule to <strong>TRAIN</strong> someone in 411</li>
+        <li>Schedule <strong>START</strong> — first Commands of Christ meeting at obeychrist.com</li>
       </ul>
     </div>
   </div>
+  <div class="sl">Spiritual Preparation</div>
+  <div class="rc" onclick="toggleRC(this)">
+    <div class="rc-icon">🙏</div><div class="rc-title">Prayer Walking Guide</div>
+    <div class="rc-desc">How to intercede powerfully for your area</div>
+    <div class="rc-body">
+      <div class="scr">"The harvest is plentiful, but the laborers are few. Pray therefore to the Lord of the harvest." — Luke 10:2</div>
+      <h4>What to Pray</h4>
+      <ul>
+        <li>Spiritual breakthrough in every home</li>
+        <li>Salvations — pray for people by name</li>
+        <li>For laborers — more workers in this harvest</li>
+        <li>For Persons of Peace — ask God to highlight them</li>
+        <li>Against spiritual darkness — that bondage be broken</li>
+      </ul>
+      <h4>Tips</h4>
+      <ul>
+        <li>Try to eat in the neighborhood — stay immersed</li>
+        <li>If asked what you're doing: <em>"Praying blessings — can we pray for you?"</em></li>
+        <li>Note where prayer feels heavy or blocked — tell your leader</li>
+        <li>Take breaks — this is spiritually exhausting</li>
+      </ul>
+    </div>
+  </div>
+  <div class="rc o" onclick="toggleRC(this)">
+    <div class="rc-icon">⚡</div><div class="rc-title">Holy Spirit's Power — John 14:12</div>
+    <div class="rc-desc">Why you can do greater things than you think</div>
+    <div class="rc-body">
+      <div class="scr">"Whoever believes in me will also do the works that I do; and greater works than these will he do." — John 14:12</div>
+      <h4>The Shift: Knowledge → Power</h4>
+      <p>The disciples had 3½ years with Jesus and still fled at the cross. What changed? The Holy Spirit at Pentecost. Peter went from denying Christ to boldly preaching to thousands.</p>
+      <h4>You Carry That Same Spirit</h4>
+      <p>You are a "little Christ" — carrying Jesus' presence into every conversation. A lack of boldness is a sign of not walking in the Spirit's power.</p>
+      <div class="scr">"Do not be drunk with wine... but be filled with the Spirit." — Ephesians 5:18</div>
+      <h4>Before You Go Out — Group Prayer</h4>
+      <p>Groups of 3. Lay hands on each person. Ask God to fill them so that when they speak, their words carry His authority.</p>
+    </div>
+  </div>
+  <div class="rc i" onclick="toggleRC(this)">
+    <div class="rc-icon">🌍</div><div class="rc-title">Cultural &amp; Religious Awareness</div>
+    <div class="rc-desc">Islam basics and cultural engagement tips</div>
+    <div class="rc-body">
+      <h4>What Muslims Believe</h4>
+      <ul>
+        <li>One God (Allah) — no partners; avoid "Son of God" language initially</li>
+        <li>Jesus (Isa) is honored as a prophet and the Messiah</li>
+        <li>Strong respect for Scripture — use "Injil" (Gospel) language</li>
+        <li>Five pillars: Shahada, Prayer (5×/day), Fasting, Zakat, Hajj</li>
+      </ul>
+      <h4>Bridge Points</h4>
+      <ul>
+        <li><strong>Isa Al Masih</strong> — Muslims deeply respect Isa; start here</li>
+        <li><strong>Korbani</strong> — Sacrifice concept connects to the cross powerfully</li>
+        <li>Opening: <em>"What do you think about Isa Al Masih?"</em></li>
+      </ul>
+      <h4>Cultural Respect</h4>
+      <ul>
+        <li>Remove shoes when entering a home if they do</li>
+        <li>Accept offered tea or food — refusing can offend</li>
+        <li>Greet with Assalamu Alaikum — they will light up</li>
+        <li>Don't press conversation during prayer times</li>
+        <li>Men primarily with men; women with women</li>
+      </ul>
+    </div>
+  </div>
+  <div class="sl">12-Day Prayer Guide</div>
+  <div id="prayer-guide-container"></div>
 </div>
 
-<!-- CELEBRATE -->
-<div class="screen" id="screen-celebrate">
-  <div class="sec-hdr" style="background:var(--gbj)">
-    <span style="font-size:28px">🎉</span>
-    <div><div class="sec-hdr-title">Celebrate</div><div class="sec-hdr-sub">Track what God is doing this week</div></div>
-  </div>
-  <div class="sl" style="margin-top:4px">What would you like to do?</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-    <button onclick="switchTab('log')" style="background:var(--go);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">🔄</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Follow-Up</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Record a contact or encounter</span>
-    </button>
-    <button onclick="switchTab('tally')" style="background:var(--gi);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">📊</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Daily Tally</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Submit today's counts</span>
-    </button>
-    <button onclick="switchTab('summary');buildSummary()" style="background:var(--gbj);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">📈</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Summary</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Totals &amp; full report</span>
-    </button>
-    <button onclick="switchTab('feedback')" style="background:var(--gbl);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">📝</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Feedback</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Post-trip survey</span>
-    </button>
-  </div>
-  <div class="sl" style="margin-top:28px">This Week's Counts</div>
-  <div class="sr">
-    <div class="sc"><div class="sv" id="stat-gospel2">0</div><div class="sk">Gospel</div></div>
-    <div class="sc"><div class="sv" id="stat-pop2">0</div><div class="sk">P.O.P.</div></div>
-    <div class="sc"><div class="sv" id="stat-prayer2">0</div><div class="sk">Prayer</div></div>
-    <div class="sc"><div class="sv" id="stat-salvation2">0</div><div class="sk">Decisions</div></div>
-  </div>
-</div>
-
-<!-- LOG CONTACT (sub-screen) -->
+<!-- LOG CONTACT -->
 <div class="screen" id="screen-log">
-  <div class="back-bar" onclick="switchTab('celebrate')">
-    <svg width="18" height="18" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-    <div><div class="back-bar-label">← Back to Celebrate</div><div class="back-bar-sub">Follow-Up</div></div>
-  </div>
   <div id="log-form-view">
     <div class="sl">New Contact / Encounter</div>
     <div class="card">
@@ -677,7 +504,7 @@ body{background:#0f1e2d;color:#e8f0f8}
     <div class="card">
       <div class="fg"><label class="fl">Scriptures Shared</label><input type="text" class="fi" id="contact-scripture" placeholder="e.g. Romans 10:9, John 3:16, Luke 10..."></div>
       <div class="fg"><label class="fl">Family Members Present</label><input type="text" class="fi" id="contact-family" placeholder="e.g. wife + 3 children, husband, elderly mother..."></div>
-      <div class="fg"><label class="fl">Location / Street / Address</label><input type="text" class="fi" id="contact-location" placeholder="e.g. 72nd &amp; Roosevelt, Apt 3B..."></div>
+      <div class="fg"><label class="fl">Location / Street / Address</label><input type="text" class="fi" id="contact-location" placeholder="e.g. 72nd & Roosevelt, Apt 3B..."></div>
       <div class="fg"><label class="fl">Contact Info (phone / address for follow-up)</label><input type="text" class="fi" id="contact-info" placeholder="Phone number or address"></div>
       <div class="fg"><label class="fl">Best Time for Follow-up</label><input type="text" class="fi" id="contact-followup-time" placeholder="e.g. evenings, Friday mornings, call first..."></div>
       <div class="fg"><label class="fl">Follow-up Priority</label>
@@ -700,46 +527,21 @@ body{background:#0f1e2d;color:#e8f0f8}
   <div id="log-success-view" class="ss" style="display:none">
     <div class="ss-icon">✅</div>
     <div class="ss-title">Contact Saved!</div>
-    <div class="ss-sub">Saved for this week. View your full summary from the Celebrate tab anytime.</div>
+    <div class="ss-sub">Saved for this week. Send your full summary to the team leader from the Summary tab anytime.</div>
     <div style="margin-top:24px">
       <button class="bp" onclick="resetContactForm()">Log Another Contact</button>
-      <button class="bs" onclick="switchTab('tally')">Go to Daily Tally</button>
-      <button class="bs" onclick="switchTab('celebrate')">Back to Celebrate</button>
+      <button class="bs" onclick="switchTab('daily')">Go to Daily Tally</button>
     </div>
   </div>
   <div class="sl" style="margin-top:24px">Saved This Week</div>
   <div id="contact-list"></div>
 </div>
 
-<!-- FEEDBACK (sub-screen) -->
-<div class="screen" id="screen-feedback">
-  <div class="back-bar" onclick="switchTab('celebrate')">
-    <svg width="18" height="18" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-    <div><div class="back-bar-label">← Back to Celebrate</div><div class="back-bar-sub">Feedback</div></div>
-  </div>
-  <div class="card" style="text-align:center;padding:36px 24px;border-left:4px solid var(--gbl)">
-    <div style="font-size:48px;margin-bottom:16px">📝</div>
-    <div style="font-size:17px;font-weight:700;color:var(--gi);margin-bottom:10px">Post-Trip Survey</div>
-    <div style="font-size:13px;color:#7a8fa0;line-height:1.7;margin-bottom:20px">Your feedback helps Global Gates improve every Sifting Week. The survey will be available here once your trip is complete.</div>
-    <div style="background:var(--gg);border-radius:var(--rs);padding:14px;font-size:12px;color:#7a8fa0;font-weight:600;letter-spacing:.5px;text-transform:uppercase">Coming Soon</div>
-  </div>
-</div>
-
-<!-- DAILY TALLY (sub-screen) -->
-<div class="screen" id="screen-tally">
-  <div class="back-bar" onclick="switchTab('celebrate')">
-    <svg width="18" height="18" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-    <div><div class="back-bar-label">← Back to Celebrate</div><div class="back-bar-sub">Daily Tally</div></div>
-  </div>
+<!-- DAILY TALLY -->
+<div class="screen" id="screen-daily">
   <div class="sl">Today's Counters</div>
-  <div class="card">
-    <div class="cr"><div><div class="cl">Doors Knocked</div><div class="cls">Total homes visited</div></div><div class="cc"><button class="cb m" onclick="AC('doors',-1)">−</button><div class="cv" id="cnt-doors">0</div><button class="cb p" onclick="AC('doors',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Gospel Presentations</div><div class="cls">Full 3 Circles shared</div></div><div class="cc"><button class="cb m" onclick="AC('gospel',-1)">−</button><div class="cv" id="cnt-gospel">0</div><button class="cb p" onclick="AC('gospel',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Prayer Conversations</div><div class="cls">Prayed with someone</div></div><div class="cc"><button class="cb m" onclick="AC('prayer',-1)">−</button><div class="cv" id="cnt-prayer">0</div><button class="cb p" onclick="AC('prayer',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">People of Peace Found</div><div class="cls">All 3 POP indicators met</div></div><div class="cc"><button class="cb m" onclick="AC('pop',-1)">−</button><div class="cv" id="cnt-pop">0</div><button class="cb p" onclick="AC('pop',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Jesus Films Given</div><div class="cls">Films distributed today</div></div><div class="cc"><button class="cb m" onclick="AC('films',-1)">−</button><div class="cv" id="cnt-films">0</div><button class="cb p" onclick="AC('films',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Bible Studies Scheduled</div><div class="cls">Follow-up study set up</div></div><div class="cc"><button class="cb m" onclick="AC('studies',-1)">−</button><div class="cv" id="cnt-studies">0</div><button class="cb p" onclick="AC('studies',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Salvations / Decisions</div><div class="cls">Prayed to receive Christ</div></div><div class="cc"><button class="cb m" onclick="AC('salvations',-1)">−</button><div class="cv" id="cnt-salvations">0</div><button class="cb p" onclick="AC('salvations',1)">+</button></div></div>
+  <div class="card" id="tally-counters-card">
+    <!-- Rendered dynamically from week config -->
   </div>
   <div class="sl">Daily Report</div>
   <div class="card">
@@ -779,33 +581,29 @@ body{background:#0f1e2d;color:#e8f0f8}
   <button class="bs" onclick="openEmailModal('tally')">📧 Send via Email Instead</button>
 </div>
 
-<!-- SUMMARY (sub-screen) -->
+<!-- SUMMARY -->
 <div class="screen" id="screen-summary">
-  <div class="back-bar" onclick="switchTab('celebrate')">
-    <svg width="18" height="18" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-    <div><div class="back-bar-label">← Back to Celebrate</div><div class="back-bar-sub">Weekly Summary</div></div>
-  </div>
   <div id="summary-content"><div style="text-align:center;padding:40px;color:#a0b0c0;font-size:14px">Loading summary...</div></div>
 </div>
 
 </div><!-- /main -->
 
-<!-- TAB BAR -->
+<!-- TABS -->
 <div class="tabbar">
   <button class="tab-btn active" id="tab-home" onclick="switchTab('home')">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
   </button>
-  <button class="tab-btn" id="tab-prepare" onclick="switchTab('prepare')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Prepare
+  <button class="tab-btn" id="tab-resources" onclick="switchTab('resources')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>Resources
   </button>
-  <button class="tab-btn" id="tab-pray" onclick="switchTab('pray')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>Pray
+  <button class="tab-btn" id="tab-log" onclick="switchTab('log')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>Log
   </button>
-  <button class="tab-btn" id="tab-share" onclick="switchTab('share')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Share
+  <button class="tab-btn" id="tab-daily" onclick="switchTab('daily')">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Tally
   </button>
-  <button class="tab-btn" id="tab-celebrate" onclick="switchTab('celebrate')">
-    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Celebrate
+  <button class="tab-btn" id="tab-summary" onclick="switchTab('summary');buildSummary()">
+    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Summary
   </button>
 </div>
 
@@ -867,7 +665,24 @@ body{background:#0f1e2d;color:#e8f0f8}
 
 <div class="toast" id="toast"></div>
 
-<script>
+<script type="module">
+import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, collection, addDoc, query, where, getDocs, serverTimestamp }
+                          from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyC9fQikLwGNo7WYQ-8Ch1VA9v7HrDzXH3I",
+  authDomain:        "gg-sifting-admin.firebaseapp.com",
+  projectId:         "gg-sifting-admin",
+  storageBucket:     "gg-sifting-admin.firebasestorage.app",
+  messagingSenderId: "440903094020",
+  appId:             "1:440903094020:web:26c982cb7e443c1bac4a51"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const db          = getFirestore(firebaseApp);
+
+// ── Prayer guide data ────────────────────────────────────────
 const PD=[
   {t:'Vision for the Lost',v:'Matthew 9:36–38',pts:['Pray that God would break your heart for people far from Him','Pray for laborers — ask God to send more workers into this harvest','Ask God to give you His eyes to see the spiritual need around you']},
   {t:'Spiritual Preparation',v:'Ephesians 6:10–18',pts:['Pray on the full armor of God — go through each piece today','Pray against forces that blind people to the gospel','Ask for boldness and clear speech to proclaim Christ']},
@@ -883,241 +698,517 @@ const PD=[
   {t:'For Your Return Home',v:'Matthew 28:19–20',pts:["Pray what God does in you this week continues when you return home","Ask God to show you 1–2 people in your own life to share with","Pray you would train others in what you've learned — multiplying the work"]},
 ];
 
-const ST8={
-  currentWeek:{name:'Sifting Week',code:'SIFTING'},
-  weeks:[{name:'Summer 2025',code:'SUMMER25'},{name:'Fall 2025',code:'FALL25'},{name:'Spring 2026',code:'SPRING26'}],
-  counters:{doors:0,gospel:0,prayer:0,pop:0,films:0,studies:0,salvations:0},
-  contacts:[],emailType:'tally'
+// ── App state ────────────────────────────────────────────────
+const ST8 = {
+  weekConfig:  null,   // full Firestore week document (set after code word lookup)
+  currentWeek: { name: 'Sifting Week', code: '' },
+  counters:    {},
+  contacts:    [],
+  emailType:   'tally'
 };
 
-const CELEBRATE_SUBS=['log','tally','summary','feedback'];
-
-function loadState(){
-  try{
-    const s=JSON.parse(localStorage.getItem('gg_v3')||'{}');
-    if(s.cw)ST8.currentWeek=s.cw;
-    if(s.wks)ST8.weeks=s.wks;
-    if(s.cnt)ST8.counters=s.cnt;
-    if(s.con)ST8.contacts=s.con;
-    const to=localStorage.getItem('gg_et');const fr=localStorage.getItem('gg_ef');
-    if(to)document.getElementById('email-to').value=to;
-    if(fr)document.getElementById('email-from').value=fr;
-  }catch(e){}
-  updateNav();updateCUI();updateStats();renderContacts();buildPG();
-}
-function save(){
-  try{localStorage.setItem('gg_v3',JSON.stringify({cw:ST8.currentWeek,wks:ST8.weeks,cnt:ST8.counters,con:ST8.contacts}));}catch(e){}
+// ── LocalStorage helpers ─────────────────────────────────────
+function save() {
+  try {
+    localStorage.setItem('gg_v3', JSON.stringify({
+      cw:  ST8.currentWeek,
+      cfg: ST8.weekConfig,
+      cnt: ST8.counters,
+      con: ST8.contacts
+    }));
+  } catch(e) {}
 }
 
-function switchTab(tab){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('screen-'+tab).classList.add('active');
-  const activeTabId=CELEBRATE_SUBS.includes(tab)?'tab-celebrate':'tab-'+tab;
-  const btn=document.getElementById(activeTabId);
-  if(btn)btn.classList.add('active');
-  window.scrollTo(0,0);
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem('gg_v3') || '{}');
+    if (s.cw)  ST8.currentWeek = s.cw;
+    if (s.cfg) ST8.weekConfig  = s.cfg;
+    if (s.cnt) ST8.counters    = s.cnt;
+    if (s.con) ST8.contacts    = s.con;
+    const to = localStorage.getItem('gg_et');
+    const fr = localStorage.getItem('gg_ef');
+    if (to) document.getElementById('email-to').value  = to;
+    if (fr) document.getElementById('email-from').value = fr;
+  } catch(e) {}
 }
 
-function toggleRC(card){card.querySelector('.rc-body').classList.toggle('open');}
-function toggleCheck(item){
-  const b=item.querySelector('.chb'),t=item.querySelector('.cht');
-  b.classList.toggle('ck');t.classList.toggle('ck');
-  b.innerHTML=b.classList.contains('ck')?'<svg width="12" height="12" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':'';
-}
-function ST(el,gid){document.getElementById(gid).querySelectorAll('.to').forEach(o=>o.classList.remove('s'));el.classList.add('s');}
-function GS(gid){const s=document.querySelector('#'+gid+' .to.s');return s?s.getAttribute('data-val'):'';}
-
-function AC(key,d){ST8.counters[key]=Math.max(0,(ST8.counters[key]||0)+d);updateCUI();updateStats();save();}
-function updateCUI(){for(const k in ST8.counters){const e=document.getElementById('cnt-'+k);if(e)e.textContent=ST8.counters[k];}}
-function updateStats(){
-  ['stat-gospel','stat-gospel2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=ST8.counters.gospel||0;});
-  ['stat-pop','stat-pop2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=ST8.counters.pop||0;});
-  ['stat-prayer','stat-prayer2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=ST8.counters.prayer||0;});
-  ['stat-salvation','stat-salvation2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=ST8.counters.salvations||0;});
+// ── Code word entry screen ───────────────────────────────────
+function showCWScreen() {
+  const s = document.getElementById('cw-screen');
+  s.classList.remove('hide');
+  s.style.display = 'flex';
+  setTimeout(() => document.getElementById('cw-input').focus(), 300);
 }
 
-function openWeekModal(){renderWL();document.getElementById('week-modal').classList.add('show');}
-function renderWL(){
-  document.getElementById('week-list').innerHTML=ST8.weeks.map((w,i)=>`
-    <div class="wpi ${w.code===ST8.currentWeek.code?'aw':''}" onclick="selWeek(${i})">
-      <div><div class="wpn">${w.name}</div><div class="wpc">Code: ${w.code}</div></div>
-      ${w.code===ST8.currentWeek.code?'<svg width="18" height="18" fill="none" stroke="var(--gbj)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':''}
-    </div>`).join('');
-}
-function selWeek(i){ST8.currentWeek=ST8.weeks[i];updateNav();save();renderWL();showToast('Week: '+ST8.currentWeek.name);}
-function setWeekFromCode(){
-  const code=document.getElementById('week-code-input').value.trim().toUpperCase();
-  if(!code){showToast('Enter a code word');return;}
-  const ex=ST8.weeks.find(w=>w.code===code);
-  if(ex){selWeek(ST8.weeks.indexOf(ex));}
-  else{ST8.weeks.unshift({name:'Week '+code,code});ST8.currentWeek=ST8.weeks[0];updateNav();save();renderWL();showToast('New week: '+code);}
-  document.getElementById('week-code-input').value='';
-}
-function addNewWeek(){
-  const n=prompt('Week name:');if(!n)return;
-  const c=prompt('Code word:');if(!c)return;
-  ST8.weeks.unshift({name:n,code:c.toUpperCase()});ST8.currentWeek=ST8.weeks[0];updateNav();save();renderWL();showToast('Week added!');
-}
-function updateNav(){
-  document.getElementById('nav-week-name').textContent=ST8.currentWeek.name;
-  document.getElementById('nav-week-code').textContent=ST8.currentWeek.code;
+function hideCWScreen() {
+  const s = document.getElementById('cw-screen');
+  s.classList.add('hide');
+  setTimeout(() => s.style.display = 'none', 400);
 }
 
-function getCheckedTexts(cid){
-  const r=[];document.querySelectorAll('#'+cid+' .chb.ck').forEach(b=>r.push(b.nextElementSibling.textContent.trim()));return r;
-}
-function gv(id){return document.getElementById(id)?.value?.trim()||'';}
+async function submitCodeWord() {
+  const input = document.getElementById('cw-input').value.trim().toUpperCase();
+  const errEl = document.getElementById('cw-error');
+  const loadEl = document.getElementById('cw-loading');
+  const btn   = document.getElementById('cw-btn');
 
-function submitContact(){
-  const name=gv('contact-name')||'Unnamed person';
-  const happened=GS('what-happened');if(!happened){showToast('Select what happened');return;}
-  const c={id:Date.now(),week:ST8.currentWeek.code,name,type:GS('encounter-type'),religion:GS('religion'),
-    lang:gv('contact-lang'),gender:GS('gender'),happened,response:GS('response'),salvation:GS('salvation'),
-    popIndicators:getCheckedTexts('pop-checklist'),scripture:gv('contact-scripture'),family:gv('contact-family'),
-    location:gv('contact-location'),contactInfo:gv('contact-info'),followupTime:gv('contact-followup-time'),
-    followup:GS('followup-needed'),atmosphere:gv('contact-atmosphere'),notes:gv('contact-notes'),
-    prayerReq:gv('contact-prayer-req'),time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
-    date:new Date().toLocaleDateString()};
-  ST8.contacts.push(c);
-  if(c.happened==='shared-gospel')ST8.counters.gospel=(ST8.counters.gospel||0)+1;
-  if(c.happened==='prayed-together')ST8.counters.prayer=(ST8.counters.prayer||0)+1;
-  if(c.salvation==='yes')ST8.counters.salvations=(ST8.counters.salvations||0)+1;
-  if(c.popIndicators.length>=3)ST8.counters.pop=(ST8.counters.pop||0)+1;
-  updateCUI();updateStats();save();
-  document.getElementById('log-form-view').style.display='none';
-  document.getElementById('log-success-view').style.display='block';
-  renderContacts();
-  if(c.followup==='urgent')setTimeout(()=>showToast('⚡ URGENT — Call your team leader now!'),500);
-}
+  errEl.textContent = '';
+  if (!input || input.length < 3) {
+    errEl.textContent = 'Please enter your code word.';
+    return;
+  }
 
-function resetContactForm(){
-  document.getElementById('log-form-view').style.display='block';
-  document.getElementById('log-success-view').style.display='none';
-  ['contact-name','contact-lang','contact-scripture','contact-family','contact-location',
-   'contact-info','contact-followup-time','contact-atmosphere','contact-notes','contact-prayer-req'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
-  document.querySelectorAll('#log-form-view .chb.ck').forEach(b=>{b.classList.remove('ck');b.innerHTML='';b.nextElementSibling.classList.remove('ck');});
-}
+  btn.disabled = true;
+  loadEl.style.display = 'flex';
 
-function renderContacts(){
-  const list=document.getElementById('contact-list');
-  const wc=ST8.contacts.filter(c=>c.week===ST8.currentWeek.code);
-  if(!wc.length){list.innerHTML='<div style="font-size:13px;color:#a0b0c0;text-align:center;padding:16px">No contacts logged yet this week</div>';return;}
-  const dc={gospel:'dg',prayer:'dp','prayed-together':'dp','shared-gospel':'dg','bible-study':'dst','gave-film':'dp','offered-prayer':'dp','prayer-only':'dp'};
-  list.innerHTML=wc.slice().reverse().map(c=>`
-    <div class="ci">
-      <div class="cd ${dc[c.happened]||'dp'}"></div>
-      <div style="flex:1;min-width:0">
-        <div class="cn">${c.name} ${c.salvation==='yes'?'🎉':''}</div>
-        <div class="cm">${c.happened.replace(/-/g,' ')} · ${c.religion} ${c.lang?'('+c.lang+')':''} · ${c.response==='green'?'🟢':c.response==='yellow'?'🟡':'🔴'} · ${c.time}</div>
-        ${c.followup&&c.followup!=='no'?`<span class="ub ${c.followup==='urgent'?'uu':c.followup==='visit'?'uv':'uc'}">⚡ ${c.followup}</span>`:''}
-        ${c.popIndicators&&c.popIndicators.length>=3?'<span class="tag tg-gr" style="margin-left:4px">POP ✓</span>':''}
-      </div>
-    </div>`).join('');
-}
+  try {
+    const q    = query(collection(db, 'weeks'), where('codeWord', '==', input), where('status', '==', 'active'));
+    const snap = await getDocs(q);
 
-function submitTally(){
-  if(!gv('tally-team')){showToast('Please enter your team name');return;}
-  openEmailModal('tally');
-}
+    if (snap.empty) {
+      errEl.textContent = 'Code word not found or this week has ended. Check with your team leader.';
+      btn.disabled = false;
+      loadEl.style.display = 'none';
+      return;
+    }
 
-function openEmailModal(type){
-  ST8.emailType=type;
-  localStorage.setItem('gg_et',document.getElementById('email-to').value);
-  localStorage.setItem('gg_ef',document.getElementById('email-from').value);
-  document.getElementById('email-modal-title').textContent=type==='tally'?'📊 Send Daily Tally':'📋 Send Contact Report';
-  document.getElementById('email-preview').textContent=buildEmailBody(type).substring(0,300)+'...';
-  document.getElementById('email-modal').classList.add('show');
-}
+    // Found — load config
+    const docSnap   = snap.docs[0];
+    const weekData  = { id: docSnap.id, ...docSnap.data() };
+    ST8.weekConfig  = weekData;
+    ST8.currentWeek = { name: weekData.label, code: weekData.codeWord };
 
-function buildEmailBody(type){
-  const week=ST8.currentWeek.name+' ('+ST8.currentWeek.code+')';
-  const name=gv('email-from')||'Team member';
-  if(type==='tally'){
-    const c=ST8.counters,team=gv('tally-team'),day=GS('sifting-day')||'?';
-    return `GLOBAL GATES — DAILY TALLY REPORT\nSubmitted by: ${name} | Team: ${team}\nWeek: ${week} | Day: ${day} | Date: ${new Date().toLocaleDateString()}\nArea: ${gv('tally-area')}\n\n=== TODAY'S COUNTS ===\nDoors Knocked: ${c.doors}\nGospel Presentations: ${c.gospel}\nPrayer Conversations: ${c.prayer}\nPeople of Peace Found: ${c.pop}\nJesus Films Given: ${c.films}\nBible Studies Scheduled: ${c.studies}\nSalvations / Decisions: ${c.salvations}\n\n=== SPIRITUAL ATMOSPHERE ===\nOpenness: ${GS('spiritual-atm')}\nTeam Morale: ${GS('team-morale')}\n\n=== TODAY'S STORY ===\n${gv('tally-story')||'(none entered)'}\n\n=== SPIRITUAL WARFARE / RESISTANCE ===\n${gv('tally-warfare')||'(none noted)'}\n\n=== TEAM PRAYER REQUESTS ===\n${gv('tally-prayer')||'(none)'}\n\n=== MATERIALS / LOGISTICS ===\n${gv('tally-logistics')||'(none)'}\n\n— Submitted via GG Sifting Week App`;
-  }else{
-    const cons=ST8.contacts.filter(c=>c.week===ST8.currentWeek.code);
-    if(!cons.length)return 'No contacts logged for this week yet.';
-    const lat=cons[cons.length-1];
-    return `GLOBAL GATES — CONTACT REPORT\nSubmitted by: ${name}\nWeek: ${week} | Date: ${lat.date} at ${lat.time}\n\n=== CONTACT DETAILS ===\nName: ${lat.name}\nEncounter Type: ${lat.type}\nReligion: ${lat.religion}\nLanguage/Background: ${lat.lang||'not noted'}\nGender: ${lat.gender}\n\n=== WHAT HAPPENED ===\nActivity: ${lat.happened}\nGospel Response: ${lat.response==='green'?'GREEN — Open/Believed':lat.response==='yellow'?'YELLOW — Somewhat open':'RED — Not open'}\nPrayed to Receive Christ: ${lat.salvation==='yes'?'YES! 🎉':lat.salvation==='uncertain'?'Uncertain':'Not yet'}\n\n=== PERSON OF PEACE INDICATORS ===\n${lat.popIndicators&&lat.popIndicators.length?lat.popIndicators.map(i=>'✓ '+i).join('\n'):'None checked'}\n\n=== FOLLOW-UP INFO ===\nPriority: ${lat.followup}\nContact Info: ${lat.contactInfo||'not provided'}\nBest Time: ${lat.followupTime||'not noted'}\nLocation: ${lat.location||'not noted'}\nFamily Present: ${lat.family||'not noted'}\nScriptures Shared: ${lat.scripture||'not noted'}\n\n=== NOTES ===\n${lat.notes||'(no notes)'}\n\n=== SPIRITUAL ATMOSPHERE ===\n${lat.atmosphere||'(not noted)'}\n\n=== THEIR PRAYER REQUESTS ===\n${lat.prayerReq||'(none noted)'}\n\n— Submitted via GG Sifting Week App`;
+    // Initialise counters from tallyFields if first time for this code word
+    const savedCode = ST8.counters._code;
+    if (savedCode !== input) {
+      ST8.counters = { _code: input };
+      (weekData.tallyFields || []).filter(f => f.active).forEach(f => { ST8.counters[f.id] = 0; });
+    }
+
+    save();
+    setSyncDot('on');
+    updateNav();
+    renderTallyCounters();
+    hideCWScreen();
+    showToast('Week loaded: ' + weekData.label + ' 🎉');
+
+  } catch(err) {
+    console.error(err);
+    errEl.textContent = 'Could not connect. Check your internet and try again.';
+    btn.disabled = false;
+    loadEl.style.display = 'none';
   }
 }
 
-function sendEmail(){
-  const to=document.getElementById('email-to').value.trim();
-  if(!to){showToast('Enter an email address');return;}
-  localStorage.setItem('gg_et',to);localStorage.setItem('gg_ef',document.getElementById('email-from').value);
-  const subj=ST8.emailType==='tally'?`GG Daily Tally — ${ST8.currentWeek.code} Day ${GS('sifting-day')||'?'}`:`GG Contact Report — ${ST8.currentWeek.code}`;
-  window.location.href=`mailto:${to}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(buildEmailBody(ST8.emailType))}`;
-  closeModal('email-modal');showToast('Opening email app...');
+document.getElementById('cw-btn').addEventListener('click', submitCodeWord);
+document.getElementById('cw-input').addEventListener('keydown', e => { if (e.key === 'Enter') submitCodeWord(); });
+document.getElementById('cw-input').addEventListener('input', e => {
+  e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+});
+
+// ── Sync dot ─────────────────────────────────────────────────
+function setSyncDot(state) {
+  const d = document.getElementById('sync-dot');
+  d.className = 'sync-dot' + (state === 'on' ? '' : state === 'off' ? ' off' : ' pending');
 }
 
-function buildSummary(){
-  const wc=ST8.contacts.filter(c=>c.week===ST8.currentWeek.code);
-  const c=ST8.counters;
-  const slv=wc.filter(x=>x.salvation==='yes');
-  const pops=wc.filter(x=>x.popIndicators&&x.popIndicators.length>=3);
-  const urg=wc.filter(x=>x.followup==='urgent');
-  const fu=wc.filter(x=>x.followup&&x.followup!=='no');
-  let html=`
-  <div class="sl">Week: ${ST8.currentWeek.name} (${ST8.currentWeek.code})</div>
-  <div class="hb gr"><div style="font-size:13px;font-weight:700;color:#2e7d32;margin-bottom:8px">🎉 Decisions for Christ: ${c.salvations}</div>
-    ${slv.length?slv.map(x=>`<div style="font-size:12px;color:#3d5068;margin-bottom:3px">• ${x.name} ${x.lang?'('+x.lang+')':''} — ${x.location||'location not noted'}</div>`).join(''):'<div style="font-size:12px;color:#7a8fa0">None logged yet</div>'}
-  </div>
-  ${urg.length?`<div class="hb o"><div style="font-size:13px;font-weight:700;color:#c62828;margin-bottom:8px">⚡ Urgent Follow-ups (${urg.length})</div>
-    ${urg.map(x=>`<div style="font-size:12px;color:#3d5068;margin-bottom:6px"><strong>${x.name}</strong> · ${x.contactInfo||'no contact info'}<br><span style="color:#7a8fa0">${x.location||''} ${x.followupTime?'— Best time: '+x.followupTime:''}</span></div>`).join('')}</div>`:''}
-  <div class="sl">Weekly Totals</div>
-  <div class="sst">
-    <div class="ssr"><div class="ssk">Doors Knocked</div><div class="ssv">${c.doors}</div></div>
-    <div class="ssr"><div class="ssk">Gospel Presentations</div><div class="ssv">${c.gospel}</div></div>
-    <div class="ssr"><div class="ssk">Prayer Conversations</div><div class="ssv">${c.prayer}</div></div>
-    <div class="ssr"><div class="ssk">People of Peace Found</div><div class="ssv">${c.pop}</div></div>
-    <div class="ssr"><div class="ssk">Jesus Films Given</div><div class="ssv">${c.films}</div></div>
-    <div class="ssr"><div class="ssk">Bible Studies Scheduled</div><div class="ssv">${c.studies}</div></div>
-    <div class="ssr"><div class="ssk">Salvations / Decisions</div><div class="ssv">${c.salvations}</div></div>
-    <div class="ssr"><div class="ssk">Total Contacts Logged</div><div class="ssv">${wc.length}</div></div>
-  </div>
-  ${pops.length?`<div class="sl">People of Peace (${pops.length})</div>${pops.map(x=>`<div class="card" style="border-left:4px solid #4caf50;margin-bottom:8px"><div class="card-title">${x.name} <span class="tag tg-gr">POP</span></div><div class="card-sub">${x.religion} ${x.lang?'· '+x.lang:''} · ${x.location||'no location'}</div>${x.contactInfo?`<div style="font-size:12px;margin-top:4px;color:var(--gbl)">📞 ${x.contactInfo}</div>`:''} ${x.followupTime?`<div style="font-size:12px;color:#7a8fa0">Best time: ${x.followupTime}</div>`:''}</div>`).join('')}`:''}
-  ${fu.length?`<div class="sl">All Follow-ups (${fu.length})</div>${fu.map(x=>`<div class="ci"><div class="cd ${x.followup==='urgent'?'dg':x.followup==='visit'?'dst':'dp'}"></div><div style="flex:1"><div class="cn">${x.name}</div><div class="cm">${x.religion} ${x.lang?'('+x.lang+')':''} · ${x.location||'no location'}</div>${x.contactInfo?`<div style="font-size:12px;color:var(--gbl)">📞 ${x.contactInfo}</div>`:''}<span class="ub ${x.followup==='urgent'?'uu':x.followup==='visit'?'uv':'uc'}">${x.followup}</span>${x.followupTime?`<span style="font-size:11px;color:#7a8fa0;margin-left:6px">Best: ${x.followupTime}</span>`:''}</div></div>`).join('')}`:''}
-  <div class="sl">All Contacts (${wc.length})</div>
-  ${!wc.length?'<div style="text-align:center;padding:20px;color:#a0b0c0;font-size:13px">No contacts logged yet</div>':wc.map(x=>`<div class="ci"><div class="cd ${x.happened==='shared-gospel'?'dg':x.salvation==='yes'?'dpo':x.happened==='bible-study'?'dst':'dp'}"></div><div style="flex:1;min-width:0"><div class="cn">${x.name} ${x.salvation==='yes'?'🎉':''} ${x.popIndicators&&x.popIndicators.length>=3?"<span class='tag tg-gr'>POP</span>":''}</div><div class="cm">${x.date} ${x.time} · ${x.happened.replace(/-/g,' ')} · ${x.religion} ${x.lang?'('+x.lang+')':''}</div><div class="cm">${x.location||''} ${x.contactInfo?'· 📞 '+x.contactInfo:''}</div>${x.notes?`<div style="font-size:12px;color:#3d5068;margin-top:4px;line-height:1.5">${x.notes.substring(0,120)}${x.notes.length>120?'...':''}</div>`:''}</div></div>`).join('')}
-  <div style="margin-top:16px">
-    <button class="bp o" onclick="openEmailModal('tally')">📤 Email Full Report to Team</button>
-    <button class="bs" onclick="if(confirm('Clear all data for this week?')){ST8.contacts=ST8.contacts.filter(c=>c.week!==ST8.currentWeek.code);for(const k in ST8.counters)ST8.counters[k]=0;save();updateCUI();updateStats();renderContacts();buildSummary();showToast('Data cleared')}">🗑 Clear This Week's Data</button>
-  </div>`;
-  document.getElementById('summary-content').innerHTML=html;
+// ── Nav ───────────────────────────────────────────────────────
+function updateNav() {
+  document.getElementById('nav-week-name').textContent = ST8.currentWeek.name;
+  document.getElementById('nav-week-code').textContent = ST8.currentWeek.code || 'Week';
 }
 
-function buildPG(){
-  const today=new Date().getDay();
-  document.getElementById('prayer-guide-container').innerHTML=PD.map((d,i)=>`
-    <div class="pd">
-      <div class="pdh" onclick="this.nextElementSibling.classList.toggle('open')">
-        <div class="pdn ${i===today?'td':''}">${i+1}</div>
-        <div style="flex:1"><div class="pdt">${i===today?'Today — ':''}${d.t}</div><div class="pdv">${d.v}</div></div>
-        <svg width="16" height="16" fill="none" stroke="var(--gbj)" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+// ── Tab switching ────────────────────────────────────────────
+window.switchTab = function(tab) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + tab).classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+};
+
+window.toggleRC    = function(card) { card.querySelector('.rc-body').classList.toggle('open'); };
+window.toggleCheck = function(item) {
+  const b = item.querySelector('.chb'), t = item.querySelector('.cht');
+  b.classList.toggle('ck'); t.classList.toggle('ck');
+  b.innerHTML = b.classList.contains('ck') ? '<svg width="12" height="12" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+};
+window.ST = function(el, gid) {
+  document.getElementById(gid).querySelectorAll('.to').forEach(o => o.classList.remove('s'));
+  el.classList.add('s');
+};
+window.GS = function(gid) {
+  const s = document.querySelector('#' + gid + ' .to.s');
+  return s ? s.getAttribute('data-val') : '';
+};
+
+// ── Dynamic tally counters ────────────────────────────────────
+function renderTallyCounters() {
+  const card = document.getElementById('tally-counters-card');
+  const fields = ST8.weekConfig
+    ? (ST8.weekConfig.tallyFields || []).filter(f => f.active)
+    : [];
+
+  if (!fields.length) {
+    card.innerHTML = '<div style="padding:12px;font-size:13px;color:#7a8fa0;text-align:center">No tally fields configured for this week.</div>';
+    return;
+  }
+
+  card.innerHTML = fields.map(f => `
+    <div class="cr">
+      <div><div class="cl">${f.label}</div></div>
+      <div class="cc">
+        <button class="cb m" data-key="${f.id}" data-delta="-1">−</button>
+        <div class="cv" id="cnt-${f.id}">${ST8.counters[f.id] || 0}</div>
+        <button class="cb p" data-key="${f.id}" data-delta="1">+</button>
       </div>
-      <div class="pdb ${i===today?'open':''}">
-        <div class="scr" style="margin-top:10px">${d.v}</div>
-        <ul>${d.pts.map(p=>`<li>${p}</li>`).join('')}</ul>
+    </div>
+  `).join('');
+
+  card.querySelectorAll('.cb').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key   = btn.dataset.key;
+      const delta = parseInt(btn.dataset.delta);
+      AC(key, delta);
+    });
+  });
+}
+
+// ── Counters ─────────────────────────────────────────────────
+window.AC = function(key, d) {
+  ST8.counters[key] = Math.max(0, (ST8.counters[key] || 0) + d);
+  const el = document.getElementById('cnt-' + key);
+  if (el) el.textContent = ST8.counters[key];
+  updateStats();
+  save();
+};
+
+function updateCUI() {
+  const fields = ST8.weekConfig ? (ST8.weekConfig.tallyFields || []).filter(f => f.active) : [];
+  fields.forEach(f => {
+    const el = document.getElementById('cnt-' + f.id);
+    if (el) el.textContent = ST8.counters[f.id] || 0;
+  });
+}
+
+function updateStats() {
+  // Map common field IDs to home screen stats
+  const get = id => ST8.counters[id] || 0;
+  document.getElementById('stat-gospel').textContent   = get('gospel');
+  document.getElementById('stat-pop').textContent      = get('pop');
+  document.getElementById('stat-prayer').textContent   = get('prayer');
+  document.getElementById('stat-salvation').textContent = get('pof') || get('salvations') || 0;
+}
+
+// ── Contact submission ────────────────────────────────────────
+window.gv = function(id) { return document.getElementById(id)?.value?.trim() || ''; };
+window.getCheckedTexts = function(cid) {
+  const r = [];
+  document.querySelectorAll('#' + cid + ' .chb.ck').forEach(b => r.push(b.nextElementSibling.textContent.trim()));
+  return r;
+};
+
+window.submitContact = async function() {
+  const name     = gv('contact-name') || 'Unnamed person';
+  const happened = GS('what-happened');
+  if (!happened) { showToast('Select what happened'); return; }
+
+  // Snapshot follow-up recipients from week config at submit time
+  const followUpSentTo = ST8.weekConfig
+    ? (ST8.weekConfig.followUpRecipients || []).map(r => ({ ...r }))
+    : [];
+
+  const c = {
+    id:            Date.now(),
+    weekId:        ST8.weekConfig?.id || '',
+    codeWord:      ST8.currentWeek.code,
+    weekName:      ST8.currentWeek.name,
+    followUpSentTo,                         // snapshot — not a reference
+    name,
+    type:          GS('encounter-type'),
+    religion:      GS('religion'),
+    lang:          gv('contact-lang'),
+    gender:        GS('gender'),
+    happened,
+    response:      GS('response'),
+    salvation:     GS('salvation'),
+    popIndicators: getCheckedTexts('pop-checklist'),
+    scripture:     gv('contact-scripture'),
+    family:        gv('contact-family'),
+    location:      gv('contact-location'),
+    contactInfo:   gv('contact-info'),
+    followupTime:  gv('contact-followup-time'),
+    followup:      GS('followup-needed'),
+    atmosphere:    gv('contact-atmosphere'),
+    notes:         gv('contact-notes'),
+    prayerReq:     gv('contact-prayer-req'),
+    time:          new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    date:          new Date().toLocaleDateString(),
+    submittedAt:   new Date().toISOString(),
+  };
+
+  // Always save to localStorage first
+  ST8.contacts.push(c);
+  if (c.happened === 'shared-gospel')  ST8.counters.gospel     = (ST8.counters.gospel || 0) + 1;
+  if (c.happened === 'prayed-together') ST8.counters.prayer    = (ST8.counters.prayer || 0) + 1;
+  if (c.salvation === 'yes')           ST8.counters.pof        = (ST8.counters.pof || 0) + 1;
+  if (c.salvation === 'yes')           ST8.counters.salvations = (ST8.counters.salvations || 0) + 1;
+  if (c.popIndicators.length >= 3)     ST8.counters.pop        = (ST8.counters.pop || 0) + 1;
+  updateCUI(); updateStats(); save();
+
+  document.getElementById('log-form-view').style.display  = 'none';
+  document.getElementById('log-success-view').style.display = 'block';
+  renderContacts();
+  if (c.followup === 'urgent') setTimeout(() => showToast('⚡ URGENT — Call your team leader now!'), 500);
+
+  // Then try Firestore — fire and forget (don't block the UI)
+  setSyncDot('pending');
+  try {
+    const { id: localId, ...firestoreData } = c;   // exclude local timestamp ID
+    await addDoc(collection(db, 'contacts'), {
+      ...firestoreData,
+      submittedAt: serverTimestamp(),
+    });
+    setSyncDot('on');
+  } catch(err) {
+    console.warn('Firestore write failed — contact saved locally:', err);
+    setSyncDot('off');
+    showToast('Saved locally (offline mode)');
+  }
+};
+
+window.resetContactForm = function() {
+  document.getElementById('log-form-view').style.display    = 'block';
+  document.getElementById('log-success-view').style.display = 'none';
+  // Clear all form inputs
+  ['contact-name','contact-lang','contact-scripture','contact-family','contact-location',
+   'contact-info','contact-followup-time','contact-atmosphere','contact-notes','contact-prayer-req']
+    .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.querySelectorAll('.to.s').forEach(t => t.classList.remove('s'));
+  document.querySelectorAll('.chb.ck').forEach(b => {
+    b.classList.remove('ck'); b.innerHTML = '';
+    b.nextElementSibling?.classList.remove('ck');
+  });
+};
+
+function renderContacts() {
+  const list = document.getElementById('contact-list');
+  if (!list) return;
+  const wc = ST8.contacts.filter(c => c.codeWord === ST8.currentWeek.code);
+  if (!wc.length) { list.innerHTML = ''; return; }
+  list.innerHTML = wc.slice().reverse().map(x => `
+    <div class="ci">
+      <div class="cd ${x.happened === 'shared-gospel' ? 'dg' : x.salvation === 'yes' ? 'dpo' : 'dp'}"></div>
+      <div style="flex:1;min-width:0">
+        <div class="cn">${x.name} ${x.salvation === 'yes' ? '🎉' : ''}</div>
+        <div class="cm">${x.date} · ${(x.happened||'').replace(/-/g,' ')} · ${x.religion||''}</div>
+        ${x.notes ? `<div style="font-size:12px;color:#3d5068;margin-top:4px">${x.notes.substring(0,80)}${x.notes.length>80?'...':''}</div>` : ''}
       </div>
     </div>`).join('');
 }
 
-function closeModal(id){document.getElementById(id).classList.remove('show');}
-document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show');}));
-function showInstall(){document.getElementById('install-modal').classList.add('show');}
+// ── Tally submission ──────────────────────────────────────────
+window.submitTally = async function() {
+  if (!gv('tally-team')) { showToast('Please enter your team name'); return; }
 
-function showToast(msg){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
+  const fields  = ST8.weekConfig ? (ST8.weekConfig.tallyFields || []).filter(f => f.active) : [];
+  const counts  = {};
+  fields.forEach(f => { counts[f.id] = ST8.counters[f.id] || 0; });
+
+  const tally = {
+    weekId:    ST8.weekConfig?.id || '',
+    codeWord:  ST8.currentWeek.code,
+    weekName:  ST8.currentWeek.name,
+    date:      new Date().toLocaleDateString(),
+    submitter: gv('tally-submitter'),
+    team:      gv('tally-team'),
+    day:       GS('sifting-day'),
+    area:      gv('tally-area'),
+    atmosphere: GS('spiritual-atm'),
+    morale:    GS('team-morale'),
+    story:     gv('tally-story'),
+    warfare:   gv('tally-warfare'),
+    prayer:    gv('tally-prayer'),
+    logistics: gv('tally-logistics'),
+    counts,
+    submittedAt: new Date().toISOString(),
+  };
+
+  // Always save locally via email modal (existing behaviour)
+  openEmailModal('tally');
+
+  // Also write to Firestore
+  setSyncDot('pending');
+  try {
+    await addDoc(collection(db, 'tallies'), {
+      ...tally,
+      submittedAt: serverTimestamp(),
+    });
+    setSyncDot('on');
+    showToast('Tally saved to cloud ✓');
+  } catch(err) {
+    console.warn('Firestore tally write failed — email fallback active:', err);
+    setSyncDot('off');
+  }
+};
+
+// ── Email modal (existing behaviour kept) ────────────────────
+window.openEmailModal = function(type) {
+  ST8.emailType = type;
+  localStorage.setItem('gg_et', document.getElementById('email-to').value);
+  localStorage.setItem('gg_ef', document.getElementById('email-from').value);
+  document.getElementById('email-modal-title').textContent = type === 'tally' ? '📊 Send Daily Tally' : '📋 Send Contact Report';
+  document.getElementById('email-preview').textContent = buildEmailBody(type).substring(0, 300) + '...';
+  document.getElementById('email-modal').classList.add('show');
+};
+
+function buildEmailBody(type) {
+  const week = ST8.currentWeek.name + ' (' + ST8.currentWeek.code + ')';
+  const name = gv('email-from') || 'Team member';
+  if (type === 'tally') {
+    const fields = ST8.weekConfig ? (ST8.weekConfig.tallyFields || []).filter(f => f.active) : [];
+    const countLines = fields.map(f => `${f.label}: ${ST8.counters[f.id] || 0}`).join('\n');
+    const team = gv('tally-team'), day = GS('sifting-day') || '?';
+    return `GLOBAL GATES — DAILY TALLY REPORT\nSubmitted by: ${name} | Team: ${team}\nWeek: ${week} | Day: ${day} | Date: ${new Date().toLocaleDateString()}\nArea: ${gv('tally-area')}\n\n=== TODAY'S COUNTS ===\n${countLines}\n\n=== SPIRITUAL ATMOSPHERE ===\nOpenness: ${GS('spiritual-atm')}\nTeam Morale: ${GS('team-morale')}\n\n=== TODAY'S STORY ===\n${gv('tally-story') || '(none entered)'}\n\n=== SPIRITUAL WARFARE / RESISTANCE ===\n${gv('tally-warfare') || '(none noted)'}\n\n=== TEAM PRAYER REQUESTS ===\n${gv('tally-prayer') || '(none)'}\n\n=== MATERIALS / LOGISTICS ===\n${gv('tally-logistics') || '(none)'}\n\n— Submitted via GG Sifting Week App`;
+  } else {
+    const cons = ST8.contacts.filter(c => c.codeWord === ST8.currentWeek.code);
+    if (!cons.length) return 'No contacts logged for this week yet.';
+    const lat = cons[cons.length - 1];
+    return `GLOBAL GATES — CONTACT REPORT\nSubmitted by: ${name}\nWeek: ${week} | Date: ${lat.date} at ${lat.time}\n\n=== CONTACT DETAILS ===\nName: ${lat.name}\nEncounter Type: ${lat.type}\nReligion: ${lat.religion}\nLanguage/Background: ${lat.lang || 'not noted'}\nGender: ${lat.gender}\n\n=== WHAT HAPPENED ===\nActivity: ${lat.happened}\nGospel Response: ${lat.response === 'green' ? 'GREEN — Open/Believed' : lat.response === 'yellow' ? 'YELLOW — Somewhat open' : 'RED — Not open'}\nPrayed to Receive Christ: ${lat.salvation === 'yes' ? 'YES! 🎉' : lat.salvation === 'uncertain' ? 'Uncertain' : 'Not yet'}\n\n=== FOLLOW-UP INFO ===\nPriority: ${lat.followup}\nContact Info: ${lat.contactInfo || 'not provided'}\n\n=== NOTES ===\n${lat.notes || '(no notes)'}\n\n— Submitted via GG Sifting Week App`;
+  }
 }
 
+window.sendEmail = function() {
+  const to = document.getElementById('email-to').value.trim();
+  if (!to) { showToast('Enter an email address'); return; }
+  localStorage.setItem('gg_et', to);
+  localStorage.setItem('gg_ef', document.getElementById('email-from').value);
+  const subj = ST8.emailType === 'tally'
+    ? `GG Daily Tally — ${ST8.currentWeek.code} Day ${GS('sifting-day') || '?'}`
+    : `GG Contact Report — ${ST8.currentWeek.code}`;
+  window.location.href = `mailto:${to}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(buildEmailBody(ST8.emailType))}`;
+  closeModal('email-modal');
+  showToast('Opening email app...');
+};
+
+// ── Week modal (now just shows current week + change option) ──
+window.openWeekModal = function() {
+  document.getElementById('week-modal').classList.add('show');
+  const list = document.getElementById('week-list');
+  if (ST8.weekConfig) {
+    list.innerHTML = `
+      <div class="wpi aw">
+        <div>
+          <div class="wpn">${ST8.weekConfig.label}</div>
+          <div class="wpc">Code: ${ST8.weekConfig.codeWord} · ${ST8.weekConfig.city}</div>
+        </div>
+        <svg width="18" height="18" fill="none" stroke="var(--gbj)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>`;
+  } else {
+    list.innerHTML = '<div style="font-size:13px;color:#7a8fa0;padding:8px 0">No week loaded yet.</div>';
+  }
+};
+
+window.setWeekFromCode = function() {
+  // In Phase 2, entering a new code word triggers a full Firestore lookup
+  const code = document.getElementById('week-code-input').value.trim().toUpperCase();
+  if (!code) { showToast('Enter a code word'); return; }
+  closeModal('week-modal');
+  document.getElementById('cw-input').value = code;
+  document.getElementById('cw-screen').style.display = 'flex';
+  document.getElementById('cw-screen').classList.remove('hide');
+  submitCodeWord();
+};
+
+window.addNewWeek = function() {
+  closeModal('week-modal');
+  showCWScreen();
+};
+
+// ── Summary ───────────────────────────────────────────────────
+window.buildSummary = function() {
+  const wc  = ST8.contacts.filter(c => c.codeWord === ST8.currentWeek.code);
+  const fields = ST8.weekConfig ? (ST8.weekConfig.tallyFields || []).filter(f => f.active) : [];
+  const slv = wc.filter(x => x.salvation === 'yes');
+  const pops = wc.filter(x => x.popIndicators && x.popIndicators.length >= 3);
+  const urg = wc.filter(x => x.followup === 'urgent');
+  const fu  = wc.filter(x => x.followup && x.followup !== 'no');
+
+  const countRows = fields.map(f =>
+    `<div class="ssr"><div class="ssk">${f.label}</div><div class="ssv">${ST8.counters[f.id] || 0}</div></div>`
+  ).join('');
+
+  let html = `
+    <div class="sl">Week: ${ST8.currentWeek.name} (${ST8.currentWeek.code})</div>
+    <div class="hb gr">
+      <div style="font-size:13px;font-weight:700;color:#2e7d32;margin-bottom:8px">🎉 Professions of Faith: ${ST8.counters.pof || ST8.counters.salvations || 0}</div>
+      ${slv.length ? slv.map(x => `<div style="font-size:12px;color:#3d5068;margin-bottom:3px">• ${x.name} ${x.lang ? '(' + x.lang + ')' : ''} — ${x.location || 'location not noted'}</div>`).join('') : '<div style="font-size:12px;color:#7a8fa0">None logged yet</div>'}
+    </div>
+    ${urg.length ? `<div class="hb o"><div style="font-size:13px;font-weight:700;color:#c62828;margin-bottom:8px">⚡ Urgent Follow-ups (${urg.length})</div>${urg.map(x => `<div style="font-size:12px;color:#3d5068;margin-bottom:6px"><strong>${x.name}</strong> · ${x.contactInfo || 'no contact info'}<br><span style="color:#7a8fa0">${x.location || ''} ${x.followupTime ? '— Best time: ' + x.followupTime : ''}</span></div>`).join('')}</div>` : ''}
+    <div class="sl">Weekly Totals</div>
+    <div class="sst">${countRows}<div class="ssr"><div class="ssk">Total Contacts Logged</div><div class="ssv">${wc.length}</div></div></div>
+    ${pops.length ? `<div class="sl">People of Peace (${pops.length})</div>${pops.map(x => `<div class="card" style="border-left:4px solid #4caf50;margin-bottom:8px"><div class="card-title">${x.name} <span class="tag tg-gr">POP</span></div><div class="card-sub">${x.religion} ${x.lang ? '· ' + x.lang : ''} · ${x.location || 'no location'}</div>${x.contactInfo ? `<div style="font-size:12px;margin-top:4px;color:var(--gbl)">📞 ${x.contactInfo}</div>` : ''}</div>`).join('')}` : ''}
+    ${fu.length ? `<div class="sl">All Follow-ups (${fu.length})</div>${fu.map(x => `<div class="ci"><div class="cd ${x.followup === 'urgent' ? 'dg' : 'dp'}"></div><div style="flex:1"><div class="cn">${x.name}</div><div class="cm">${x.religion} ${x.lang ? '(' + x.lang + ')' : ''} · ${x.location || 'no location'}</div>${x.contactInfo ? `<div style="font-size:12px;color:var(--gbl)">📞 ${x.contactInfo}</div>` : ''}<span class="ub ${x.followup === 'urgent' ? 'uu' : 'uc'}">${x.followup}</span></div></div>`).join('')}` : ''}
+    <div class="sl">All Contacts (${wc.length})</div>
+    ${!wc.length ? '<div style="text-align:center;padding:20px;color:#a0b0c0;font-size:13px">No contacts logged yet</div>' : wc.map(x => `<div class="ci"><div class="cd ${x.happened === 'shared-gospel' ? 'dg' : x.salvation === 'yes' ? 'dpo' : 'dp'}"></div><div style="flex:1;min-width:0"><div class="cn">${x.name} ${x.salvation === 'yes' ? '🎉' : ''}</div><div class="cm">${x.date} · ${(x.happened||'').replace(/-/g,' ')} · ${x.religion||''}</div></div></div>`).join('')}
+    <div style="margin-top:16px">
+      <button class="bp o" onclick="openEmailModal('tally')">📤 Email Full Report to Team</button>
+    </div>`;
+  document.getElementById('summary-content').innerHTML = html;
+};
+
+// ── Prayer guide ──────────────────────────────────────────────
+function buildPG() {
+  const today = new Date().getDay();
+  document.getElementById('prayer-guide-container').innerHTML = PD.map((d, i) => `
+    <div class="pd">
+      <div class="pdh" onclick="this.nextElementSibling.classList.toggle('open')">
+        <div class="pdn ${i === today ? 'td' : ''}">${i + 1}</div>
+        <div style="flex:1"><div class="pdt">${i === today ? 'Today — ' : ''}${d.t}</div><div class="pdv">${d.v}</div></div>
+        <svg width="16" height="16" fill="none" stroke="var(--gbj)" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="pdb ${i === today ? 'open' : ''}">
+        <div class="scr" style="margin-top:10px">${d.v}</div>
+        <ul>${d.pts.map(p => `<li>${p}</li>`).join('')}</ul>
+      </div>
+    </div>`).join('');
+}
+
+// ── Modals ────────────────────────────────────────────────────
+window.closeModal = function(id) { document.getElementById(id).classList.remove('show'); };
+document.querySelectorAll('.mo').forEach(o => o.addEventListener('click', function(e) {
+  if (e.target === this) this.classList.remove('show');
+}));
+window.showInstall = function() { document.getElementById('install-modal').classList.add('show'); };
+
+// ── Toast ─────────────────────────────────────────────────────
+window.showToast = function(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+};
+
+// ── Init ──────────────────────────────────────────────────────
 loadState();
-if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone){
-  document.getElementById('install-banner-wrap').style.display='none';
+
+if (ST8.weekConfig && ST8.currentWeek.code) {
+  // Returning user — skip code word screen
+  updateNav();
+  renderTallyCounters();
+  updateCUI();
+  updateStats();
+  renderContacts();
+  setSyncDot('on');
+  document.getElementById('cw-screen').style.display = 'none';
+} else {
+  // First launch — show code word screen
+  showCWScreen();
+}
+
+buildPG();
+
+if (window.matchMedia('(display-mode: standalone)').matches || navigator.standalone) {
+  document.getElementById('install-banner-wrap').style.display = 'none';
 }
 </script>
 </body>
