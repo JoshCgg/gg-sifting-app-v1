@@ -146,27 +146,6 @@ body{font-family:'Montserrat',sans-serif;background:var(--gg);color:var(--gi);mi
 .sec-hdr{border-radius:14px;padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px}
 .sec-hdr-title{font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff}
 .sec-hdr-sub{font-family:'Montserrat',sans-serif;font-size:11px;color:rgba(255,255,255,.75);font-weight:500}
-
-/* Code word entry screen */
-#cw-screen{position:fixed;inset:0;background:var(--gi);z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;transition:opacity .4s}
-#cw-screen.hide{opacity:0;pointer-events:none}
-.cw-logo{width:64px;height:64px;background:#fff;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:var(--gi);margin-bottom:20px}
-.cw-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:6px;text-align:center}
-.cw-sub{font-family:'Libre Baskerville',serif;font-style:italic;font-size:14px;color:rgba(236,241,238,.65);margin-bottom:36px;text-align:center;line-height:1.5}
-.cw-input-wrap{width:100%;max-width:360px;margin-bottom:12px}
-.cw-input{width:100%;padding:16px 18px;border:2px solid rgba(255,255,255,.2);border-radius:14px;background:rgba(255,255,255,.08);color:#fff;font-family:'Montserrat',sans-serif;font-size:20px;font-weight:700;letter-spacing:.12em;text-align:center;text-transform:uppercase;outline:none;transition:border-color .2s;-webkit-appearance:none}
-.cw-input::placeholder{color:rgba(255,255,255,.3);letter-spacing:.05em;font-size:15px;font-weight:500}
-.cw-input:focus{border-color:var(--gbj)}
-.cw-btn{width:100%;max-width:360px;padding:16px;background:var(--go);border:none;border-radius:14px;font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;cursor:pointer;letter-spacing:.5px;transition:background .15s,transform .1s}
-.cw-btn:active{transform:scale(.98)}
-.cw-btn:disabled{background:#7a9ab0;cursor:not-allowed}
-.cw-error{color:#ff9a94;font-size:13px;font-weight:600;margin-top:12px;text-align:center;min-height:20px}
-.cw-loading{display:flex;align-items:center;gap:10px;color:rgba(236,241,238,.7);font-size:14px;font-weight:600;margin-top:16px}
-.cw-spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.sync-dot{width:7px;height:7px;border-radius:50%;background:#4caf50;display:inline-block;margin-right:4px;flex-shrink:0}
-.sync-dot.off{background:#f44336}
-.sync-dot.pending{background:var(--go)}
 @media(prefers-color-scheme:dark){
 body{background:#0f1e2d;color:#e8f0f8}
 .topnav{background:#0a1520}
@@ -196,22 +175,6 @@ body{background:#0f1e2d;color:#e8f0f8}
 </head>
 <body>
 
-<!-- CODE WORD ENTRY SCREEN -->
-<div id="cw-screen" style="display:none">
-  <div class="cw-logo">GG</div>
-  <div class="cw-title">Welcome to<br>Sifting Week</div>
-  <div class="cw-sub">Enter the code word your<br>team leader gave you</div>
-  <div class="cw-input-wrap">
-    <input class="cw-input" id="cw-input" type="text" placeholder="e.g. BEACON26" maxlength="12" autocomplete="off" autocorrect="off" spellcheck="false" />
-  </div>
-  <button class="cw-btn" id="cw-btn">Let's Go</button>
-  <div class="cw-error" id="cw-error"></div>
-  <div class="cw-loading" id="cw-loading" style="display:none">
-    <div class="cw-spinner"></div>
-    Looking up your week...
-  </div>
-</div>
-
 <div class="topnav">
   <div class="topnav-brand">
     <div class="gg-logo">GG</div>
@@ -221,7 +184,6 @@ body{background:#0f1e2d;color:#e8f0f8}
     </div>
   </div>
   <div class="week-badge" onclick="openWeekModal()">
-    <span class="sync-dot" id="sync-dot"></span>
     <svg width="12" height="12" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     <span id="nav-week-code">Week</span>
   </div>
@@ -770,7 +732,7 @@ body{background:#0f1e2d;color:#e8f0f8}
     <div><div class="back-bar-label">← Back to Celebrate</div><div class="back-bar-sub">Daily Tally</div></div>
   </div>
   <div class="sl">Today's Counters</div>
-  <div class="card" id="tally-counters-card">
+  <div class="card">
     <div class="cr"><div><div class="cl">Doors Knocked</div><div class="cls">Total homes visited</div></div><div class="cc"><button class="cb m" onclick="AC('doors',-1)">−</button><div class="cv" id="cnt-doors">0</div><button class="cb p" onclick="AC('doors',1)">+</button></div></div>
     <div class="cr"><div><div class="cl">Gospel Presentations</div><div class="cls">Full 3 Circles shared</div></div><div class="cc"><button class="cb m" onclick="AC('gospel',-1)">−</button><div class="cv" id="cnt-gospel">0</div><button class="cb p" onclick="AC('gospel',1)">+</button></div></div>
     <div class="cr"><div><div class="cl">Prayer Conversations</div><div class="cls">Prayed with someone</div></div><div class="cc"><button class="cb m" onclick="AC('prayer',-1)">−</button><div class="cv" id="cnt-prayer">0</div><button class="cb p" onclick="AC('prayer',1)">+</button></div></div>
@@ -905,13 +867,7 @@ body{background:#0f1e2d;color:#e8f0f8}
 
 <div class="toast" id="toast"></div>
 
-<script type="module">
-import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, addDoc, query, where, getDocs, serverTimestamp }
-                          from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-const firebaseConfig={apiKey:"AIzaSyC9fQikLwGNo7WYQ-8Ch1VA9v7HrDzXH3I",authDomain:"gg-sifting-admin.firebaseapp.com",projectId:"gg-sifting-admin",storageBucket:"gg-sifting-admin.firebasestorage.app",messagingSenderId:"440903094020",appId:"1:440903094020:web:26c982cb7e443c1bac4a51"};
-const app=initializeApp(firebaseConfig);
-const db=getFirestore(app);
+<script>
 const PD=[
   {t:'Vision for the Lost',v:'Matthew 9:36–38',pts:['Pray that God would break your heart for people far from Him','Pray for laborers — ask God to send more workers into this harvest','Ask God to give you His eyes to see the spiritual need around you']},
   {t:'Spiritual Preparation',v:'Ephesians 6:10–18',pts:['Pray on the full armor of God — go through each piece today','Pray against forces that blind people to the gospel','Ask for boldness and clear speech to proclaim Christ']},
@@ -928,9 +884,8 @@ const PD=[
 ];
 
 const ST8={
-  weekConfig:null,
-  currentWeek:{name:'Sifting Week',code:''},
-  weeks:[],
+  currentWeek:{name:'Sifting Week',code:'SIFTING'},
+  weeks:[{name:'Summer 2025',code:'SUMMER25'},{name:'Fall 2025',code:'FALL25'},{name:'Spring 2026',code:'SPRING26'}],
   counters:{doors:0,gospel:0,prayer:0,pop:0,films:0,studies:0,salvations:0},
   contacts:[],emailType:'tally'
 };
@@ -941,7 +896,6 @@ function loadState(){
   try{
     const s=JSON.parse(localStorage.getItem('gg_v3')||'{}');
     if(s.cw)ST8.currentWeek=s.cw;
-    if(s.cfg)ST8.weekConfig=s.cfg;
     if(s.wks)ST8.weeks=s.wks;
     if(s.cnt)ST8.counters=s.cnt;
     if(s.con)ST8.contacts=s.con;
@@ -952,7 +906,7 @@ function loadState(){
   updateNav();updateCUI();updateStats();renderContacts();buildPG();
 }
 function save(){
-  try{localStorage.setItem('gg_v3',JSON.stringify({cw:ST8.currentWeek,cfg:ST8.weekConfig,wks:ST8.weeks,cnt:ST8.counters,con:ST8.contacts}));}catch(e){}
+  try{localStorage.setItem('gg_v3',JSON.stringify({cw:ST8.currentWeek,wks:ST8.weeks,cnt:ST8.counters,con:ST8.contacts}));}catch(e){}
 }
 
 function switchTab(tab){
@@ -1161,154 +1115,7 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),2800);
 }
 
-// ── Firebase additions ────────────────────────────────────────
-function setSyncDot(state){
-  const d=document.getElementById('sync-dot');
-  d.className='sync-dot'+(state==='on'?'':state==='off'?' off':' pending');
-}
-function showCWScreen(){
-  const s=document.getElementById('cw-screen');
-  s.style.display='flex';s.classList.remove('hide');
-  setTimeout(()=>document.getElementById('cw-input').focus(),300);
-}
-function hideCWScreen(){
-  const s=document.getElementById('cw-screen');
-  s.classList.add('hide');setTimeout(()=>s.style.display='none',400);
-}
-async function submitCodeWord(){
-  const input=document.getElementById('cw-input').value.trim().toUpperCase();
-  const errEl=document.getElementById('cw-error');
-  const loadEl=document.getElementById('cw-loading');
-  const btn=document.getElementById('cw-btn');
-  errEl.textContent='';
-  if(!input||input.length<3){errEl.textContent='Please enter your code word.';return;}
-  btn.disabled=true;loadEl.style.display='flex';
-  try{
-    const q=query(collection(db,'weeks'),where('codeWord','==',input),where('status','==','active'));
-    const snap=await getDocs(q);
-    if(snap.empty){
-      errEl.textContent='Code word not found or this week has ended. Check with your team leader.';
-      btn.disabled=false;loadEl.style.display='none';return;
-    }
-    const weekData={id:snap.docs[0].id,...snap.docs[0].data()};
-    ST8.weekConfig=weekData;
-    ST8.currentWeek={name:weekData.label,code:weekData.codeWord};
-    if(ST8.counters._code!==input){
-      ST8.counters={_code:input};
-      (weekData.tallyFields||[]).filter(f=>f.active).forEach(f=>{ST8.counters[f.id]=0;});
-    }
-    save();setSyncDot('on');updateNav();renderTallyCounters();updateCUI();updateStats();
-    hideCWScreen();showToast('Week loaded: '+weekData.label);
-  }catch(err){
-    console.error(err);
-    errEl.textContent='Could not connect. Check your internet and try again.';
-    btn.disabled=false;loadEl.style.display='none';
-  }
-}
-document.getElementById('cw-btn').addEventListener('click',submitCodeWord);
-document.getElementById('cw-input').addEventListener('keydown',e=>{if(e.key==='Enter')submitCodeWord();});
-document.getElementById('cw-input').addEventListener('input',e=>{
-  e.target.value=e.target.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
-});
-
-function renderTallyCounters(){
-  if(!ST8.weekConfig)return;
-  const fields=(ST8.weekConfig.tallyFields||[]).filter(f=>f.active);
-  if(!fields.length)return;
-  const card=document.getElementById('tally-counters-card');
-  card.innerHTML=fields.map(f=>'<div class="cr"><div><div class="cl">'+f.label+'</div></div><div class="cc"><button class="cb m" data-key="'+f.id+'" data-delta="-1">-</button><div class="cv" id="cnt-'+f.id+'">'+(ST8.counters[f.id]||0)+'</div><button class="cb p" data-key="'+f.id+'" data-delta="1">+</button></div></div>').join('');
-  card.querySelectorAll('.cb').forEach(btn=>{
-    btn.addEventListener('click',()=>AC(btn.dataset.key,parseInt(btn.dataset.delta)));
-  });
-}
-
-// Override openWeekModal to show loaded Firestore week
-const _owm=openWeekModal;
-openWeekModal=function(){
-  const list=document.getElementById('week-list');
-  if(ST8.weekConfig){
-    list.innerHTML='<div class="wpi aw"><div><div class="wpn">'+ST8.weekConfig.label+'</div><div class="wpc">Code: '+ST8.weekConfig.codeWord+' - '+(ST8.weekConfig.city||'')+'</div></div><svg width="18" height="18" fill="none" stroke="var(--gbj)" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>';
-  }else{
-    list.innerHTML='<div style="font-size:13px;color:#7a8fa0;padding:8px 0">No week loaded yet.</div>';
-  }
-  document.getElementById('week-modal').classList.add('show');
-};
-
-// Override setWeekFromCode to use Firestore lookup
-setWeekFromCode=function(){
-  const code=document.getElementById('week-code-input').value.trim().toUpperCase();
-  if(!code){showToast('Enter a code word');return;}
-  closeModal('week-modal');
-  document.getElementById('cw-input').value=code;
-  showCWScreen();submitCodeWord();
-};
-
-// Override submitContact to snapshot recipients + write to Firestore
-const _osc=submitContact;
-submitContact=async function(){
-  const name=gv('contact-name')||'Unnamed person';
-  const happened=GS('what-happened');if(!happened){showToast('Select what happened');return;}
-  const followUpSentTo=ST8.weekConfig?(ST8.weekConfig.followUpRecipients||[]).map(r=>({...r})):[];
-  const c={id:Date.now(),week:ST8.currentWeek.code,weekId:ST8.weekConfig?.id||'',
-    codeWord:ST8.currentWeek.code,weekName:ST8.currentWeek.name,followUpSentTo,
-    name,type:GS('encounter-type'),religion:GS('religion'),lang:gv('contact-lang'),
-    gender:GS('gender'),happened,response:GS('response'),salvation:GS('salvation'),
-    popIndicators:getCheckedTexts('pop-checklist'),scripture:gv('contact-scripture'),
-    family:gv('contact-family'),location:gv('contact-location'),contactInfo:gv('contact-info'),
-    followupTime:gv('contact-followup-time'),followup:GS('followup-needed'),
-    atmosphere:gv('contact-atmosphere'),notes:gv('contact-notes'),prayerReq:gv('contact-prayer-req'),
-    time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),
-    date:new Date().toLocaleDateString(),submittedAt:new Date().toISOString()};
-  ST8.contacts.push(c);
-  if(c.happened==='shared-gospel')ST8.counters.gospel=(ST8.counters.gospel||0)+1;
-  if(c.happened==='prayed-together')ST8.counters.prayer=(ST8.counters.prayer||0)+1;
-  if(c.salvation==='yes')ST8.counters.salvations=(ST8.counters.salvations||0)+1;
-  if(c.popIndicators.length>=3)ST8.counters.pop=(ST8.counters.pop||0)+1;
-  updateCUI();updateStats();save();
-  document.getElementById('log-form-view').style.display='none';
-  document.getElementById('log-success-view').style.display='block';
-  renderContacts();
-  if(c.followup==='urgent')setTimeout(()=>showToast('URGENT - Call your team leader now!'),500);
-  if(ST8.weekConfig){
-    setSyncDot('pending');
-    try{
-      const {id:lid,...fd}=c;
-      await addDoc(collection(db,'contacts'),{...fd,submittedAt:serverTimestamp()});
-      setSyncDot('on');
-    }catch(err){console.warn('Firestore contact failed:',err);setSyncDot('off');showToast('Saved locally (offline)');}
-  }
-};
-
-// Override submitTally to also write to Firestore
-const _ost=submitTally;
-submitTally=async function(){
-  if(!gv('tally-team')){showToast('Please enter your team name');return;}
-  openEmailModal('tally');
-  if(ST8.weekConfig){
-    setSyncDot('pending');
-    const fields=(ST8.weekConfig.tallyFields||[]).filter(f=>f.active);
-    const counts={};fields.forEach(f=>{counts[f.id]=ST8.counters[f.id]||0;});
-    try{
-      await addDoc(collection(db,'tallies'),{
-        weekId:ST8.weekConfig.id,codeWord:ST8.currentWeek.code,weekName:ST8.currentWeek.name,
-        date:new Date().toLocaleDateString(),submitter:gv('tally-submitter'),team:gv('tally-team'),
-        day:GS('sifting-day'),area:gv('tally-area'),atmosphere:GS('spiritual-atm'),
-        morale:GS('team-morale'),story:gv('tally-story'),warfare:gv('tally-warfare'),
-        prayer:gv('tally-prayer'),logistics:gv('tally-logistics'),
-        counts,submittedAt:serverTimestamp()
-      });
-      setSyncDot('on');
-    }catch(err){console.warn('Tally Firestore failed:',err);setSyncDot('off');}
-  }
-};
-
-// ── Init ──────────────────────────────────────────────────────
 loadState();
-if(ST8.weekConfig&&ST8.currentWeek.code){
-  updateNav();renderTallyCounters();updateCUI();updateStats();renderContacts();setSyncDot('on');
-}else{
-  showCWScreen();
-}
 if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone){
   document.getElementById('install-banner-wrap').style.display='none';
 }
