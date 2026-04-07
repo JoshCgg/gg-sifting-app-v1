@@ -8,8 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="GG Sifting">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1B456A">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" defer></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <title>Global Gates — Sifting Week</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
@@ -895,19 +895,37 @@ body{background:#0f1e2d;color:#e8f0f8}
 
 <div class="toast" id="toast"></div>
 
-<script defer>
+<script>
 
-// ─── Firebase Init ────────────────────────────────────────────────────────────
-const firebaseConfig = {
-  apiKey: "AIzaSyC9fQikLwGNo7WYQ-8Ch1VA9v7HrDzXH3I",
-  authDomain: "gg-sifting-admin.firebaseapp.com",
-  projectId: "gg-sifting-admin",
-  storageBucket: "gg-sifting-admin.firebasestorage.app",
-  messagingSenderId: "440903094020",
-  appId: "1:440903094020:web:26c982cb7e443c1bac4a51"
+// db declared at top level so all async functions below can access it
+let db;
+
+// ─── Firebase Init + Boot ─────────────────────────────────────────────────────
+// window.onload fires after all scripts in <head> (the Firebase SDKs) have
+// fully executed, guaranteeing firebase is defined before we call it.
+window.onload = function() {
+  const firebaseConfig = {
+    apiKey: "AIzaSyC9fQikLwGNo7WYQ-8Ch1VA9v7HrDzXH3I",
+    authDomain: "gg-sifting-admin.firebaseapp.com",
+    projectId: "gg-sifting-admin",
+    storageBucket: "gg-sifting-admin.firebasestorage.app",
+    messagingSenderId: "440903094020",
+    appId: "1:440903094020:web:26c982cb7e443c1bac4a51"
+  };
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+
+  // Boot
+  loadState();
+  if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone){
+    document.getElementById('install-banner-wrap').style.display='none';
+  }
+  const hasWeek=ST8.currentWeek&&ST8.currentWeek.code&&ST8.currentWeek.code!=='SIFTING';
+  if(!hasWeek){
+    document.getElementById('week-gate').style.display='flex';
+    setTimeout(()=>{const input=document.getElementById('gate-code-input');if(input)input.focus();},300);
+  }
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
 
 // ─── Prayer Guide Data ────────────────────────────────────────────────────────
 const PD=[
@@ -1240,16 +1258,7 @@ document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',function(
 
 
 
-// ─── Boot (must be last — after ST8 and all functions are defined) ────────────
-loadState();
-if(window.matchMedia('(display-mode: standalone)').matches||navigator.standalone){
-  document.getElementById('install-banner-wrap').style.display='none';
-}
-const hasWeek=ST8.currentWeek&&ST8.currentWeek.code&&ST8.currentWeek.code!=='SIFTING';
-if(!hasWeek){
-  document.getElementById('week-gate').style.display='flex';
-  setTimeout(()=>{const input=document.getElementById('gate-code-input');if(input)input.focus();},300);
-}
+
 
 </script>
 </body>
