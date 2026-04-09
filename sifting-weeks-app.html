@@ -596,7 +596,7 @@ body{background:#0f1e2d;color:#e8f0f8}
   </div>
   <div class="sl" style="margin-top:4px">What would you like to do?</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-    <button onclick="switchTab('log')" style="background:var(--go);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+    <button onclick="handleFollowUpTap()" style="background:var(--go);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
       <span style="font-size:32px;line-height:1">🔄</span>
       <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Follow-Up</span>
       <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Record a contact or encounter</span>
@@ -983,6 +983,15 @@ function switchTab(tab){
   window.scrollTo(0,0);
 }
 
+function handleFollowUpTap(){
+  var w=ST8.currentWeek;
+  if(w&&w.followUpMode==='link'&&w.followUpFormUrl){
+    window.open(w.followUpFormUrl,'_blank');
+  }else{
+    switchTab('log');
+  }
+}
+
 // ─── UI Helpers ───────────────────────────────────────────────────────────────
 function toggleRC(card){card.querySelector('.rc-body').classList.toggle('open');}
 function toggleCheck(item){
@@ -1031,7 +1040,7 @@ async function enterFromGate(){
     const snap=await db.collection('weeks').where('codeWord','==',code).limit(1).get();
     if(!snap.empty){
       const data=snap.docs[0].data();
-      const weekObj={id:snap.docs[0].id,code,name:data.label||data.name||('Week '+code),city:data.city||'',region:data.region||'',startDate:data.startDate||null,endDate:data.endDate||null,status:data.status||'active',followUpRecipients:data.followUpRecipients||[],fromFirestore:true};
+      const weekObj={id:snap.docs[0].id,code,name:data.label||data.name||('Week '+code),city:data.city||'',region:data.region||'',startDate:data.startDate||null,endDate:data.endDate||null,status:data.status||'active',followUpRecipients:data.followUpRecipients||[],followUpMode:data.followUpMode||'inapp',followUpFormUrl:data.followUpFormUrl||'',fromFirestore:true};
       const primary=(data.followUpRecipients||[]).find(r=>r.primary)||data.followUpRecipients?.[0];
       if(primary?.email){document.getElementById('email-to').value=primary.email;localStorage.setItem('gg_et',primary.email);}
       ST8.currentWeek=weekObj;ST8.weeks=[weekObj];save();updateNav();dismissGate();
@@ -1063,7 +1072,7 @@ async function setWeekFromCode(){
     const snap=await db.collection('weeks').where('codeWord','==',code).limit(1).get();
     if(!snap.empty){
       const data=snap.docs[0].data();
-      const weekObj={id:snap.docs[0].id,code,name:data.label||data.name||('Week '+code),city:data.city||'',region:data.region||'',startDate:data.startDate||null,endDate:data.endDate||null,status:data.status||'active',followUpRecipients:data.followUpRecipients||[],fromFirestore:true};
+      const weekObj={id:snap.docs[0].id,code,name:data.label||data.name||('Week '+code),city:data.city||'',region:data.region||'',startDate:data.startDate||null,endDate:data.endDate||null,status:data.status||'active',followUpRecipients:data.followUpRecipients||[],followUpMode:data.followUpMode||'inapp',followUpFormUrl:data.followUpFormUrl||'',fromFirestore:true};
       const primary=(data.followUpRecipients||[]).find(r=>r.primary)||data.followUpRecipients?.[0];
       if(primary?.email){document.getElementById('email-to').value=primary.email;localStorage.setItem('gg_et',primary.email);}
       ST8.currentWeek=weekObj;ST8.weeks=[weekObj];save();updateNav();closeModal('week-modal');showToast('✅ Switched to: '+weekObj.name);
