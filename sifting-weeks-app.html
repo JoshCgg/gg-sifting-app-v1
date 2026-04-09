@@ -984,6 +984,7 @@ function switchTab(tab){
 
 function handleFollowUpTap(){
   console.log('currentWeek:', JSON.stringify(ST8.currentWeek));
+  console.log('survey:', JSON.stringify(ST8.currentWeek.survey));
   var w=ST8.currentWeek;
   if(w&&w.followUpMode==='link'&&w.followUpFormUrl){
     window.open(w.followUpFormUrl,'_blank');
