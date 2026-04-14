@@ -170,6 +170,15 @@ body{font-family:'Montserrat',sans-serif;background:var(--bright-gray);color:var
 .header-row2{display:flex;flex-direction:column;align-items:flex-start}
 .header-week-label{font-size:9px;text-transform:uppercase;color:rgba(255,255,255,0.5);font-family:var(--font-body);letter-spacing:0.08em}
 .header-week-name{font-size:16px;font-weight:700;color:#fff;font-family:var(--font-display);text-transform:uppercase;letter-spacing:0.04em}
+.tally-card{background:var(--white);border-radius:var(--radius-card);margin:0 16px 16px;padding:16px}
+.tally-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.tally-title{font-family:var(--font-display);font-size:12px;font-weight:700;color:var(--indigo)}
+.tally-viewall{font-family:var(--font-body);font-size:12px;color:var(--blue-jeans);cursor:pointer}
+.tally-stats{display:flex;align-items:center}
+.tally-stat{flex:1;display:flex;flex-direction:column;align-items:center}
+.tally-divider{width:1px;height:32px;background:#e0e0e0;flex-shrink:0}
+.tally-num{font-size:20px;font-weight:700;color:var(--indigo)}
+.tally-lbl{font-size:9px;color:#8a9aab;margin-top:2px}
 .tile-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;margin-bottom:0}
 .tile{border:none;border-radius:16px;padding:16px;min-height:110px;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;position:relative;transition:filter .1s}
 .tile:active{filter:brightness(.9)}
@@ -283,6 +292,33 @@ body{background:#0f1e2d;color:#e8f0f8}
       <div class="tile-label">Celebrate</div>
       <div class="tile-sub">Tallies &amp; contacts</div>
     </button>
+  </div>
+  <div class="tally-card">
+    <div class="tally-header">
+      <span class="tally-title">This Week's Count</span>
+      <span class="tally-viewall" onclick="switchTab('celebrate')">View all →</span>
+    </div>
+    <div class="tally-stats">
+      <div class="tally-stat">
+        <div class="tally-num">0</div>
+        <div class="tally-lbl">Gospel</div>
+      </div>
+      <div class="tally-divider"></div>
+      <div class="tally-stat">
+        <div class="tally-num">0</div>
+        <div class="tally-lbl">Prayer</div>
+      </div>
+      <div class="tally-divider"></div>
+      <div class="tally-stat">
+        <div class="tally-num">0</div>
+        <div class="tally-lbl">Bibles</div>
+      </div>
+      <div class="tally-divider"></div>
+      <div class="tally-stat">
+        <div class="tally-num">0</div>
+        <div class="tally-lbl">Follow-ups</div>
+      </div>
+    </div>
   </div>
   <div class="sl">Daily Checklist</div>
   <div class="card">
