@@ -857,6 +857,7 @@ body{background:#0f1e2d;color:#e8f0f8}
         <div class="tg" id="encounter-type">
           <div class="to" data-val="door-to-door" onclick="ST(this,'encounter-type')">Door-to-door</div>
           <div class="to" data-val="street" onclick="ST(this,'encounter-type')">Street</div>
+          <div class="to" data-val="park" onclick="ST(this,'encounter-type')">Park</div>
           <div class="to" data-val="business" onclick="ST(this,'encounter-type')">Business</div>
           <div class="to" data-val="followup" onclick="ST(this,'encounter-type')">Follow-up Visit</div>
           <div class="to" data-val="bible-study" onclick="ST(this,'encounter-type')">Bible Study</div>
@@ -891,7 +892,7 @@ body{background:#0f1e2d;color:#e8f0f8}
       <div class="fu-divider"></div>
       <div class="fu-field">
         <label class="fl">What Happened?</label>
-        <div class="tg" id="what-happened">
+        <div class="tg" id="what-happened" data-multi="true">
           <div class="to" data-val="prayed-together" onclick="ST(this,'what-happened')">Prayed Together</div>
           <div class="to" data-val="shared-gospel" onclick="ST(this,'what-happened')">Shared Gospel</div>
           <div class="to" data-val="gave-film" onclick="ST(this,'what-happened')">Gave Jesus Film</div>
@@ -1188,7 +1189,7 @@ function toggleCheck(item){
   b.classList.toggle('ck');t.classList.toggle('ck');
   b.innerHTML=b.classList.contains('ck')?'<svg width="12" height="12" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>':'';
 }
-function ST(el,gid){document.getElementById(gid).querySelectorAll('.to').forEach(o=>o.classList.remove('s'));el.classList.add('s');}
+function ST(el,gid){const g=document.getElementById(gid);if(g.dataset.multi){el.classList.toggle('s');}else{g.querySelectorAll('.to').forEach(o=>o.classList.remove('s'));el.classList.add('s');}}
 function GS(gid){const s=document.querySelector('#'+gid+' .to.s');return s?s.getAttribute('data-val'):'';}
 function gv(id){return document.getElementById(id)?.value?.trim()||'';}
 function getCheckedTexts(cid){
