@@ -179,6 +179,10 @@ body{font-family:'Montserrat',sans-serif;background:var(--bright-gray);color:var
 .tally-divider{width:1px;height:32px;background:#e0e0e0;flex-shrink:0}
 .tally-num{font-size:20px;font-weight:700;color:var(--indigo)}
 .tally-lbl{font-size:9px;color:#8a9aab;margin-top:2px}
+.cel-header{display:flex;align-items:center;gap:12px;padding:16px 16px 8px}
+.cel-back-btn{width:30px;height:30px;border-radius:99px;border:1px solid var(--indigo);background:#fff;color:var(--indigo);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1}
+.cel-title{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--indigo)}
+.cel-subtitle{font-size:12px;color:#8a9aab;font-family:var(--font-body);margin-top:2px}
 .tile-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:16px;margin-bottom:0}
 .tile{border:none;border-radius:16px;padding:16px;min-height:110px;cursor:pointer;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;position:relative;transition:filter .1s}
 .tile:active{filter:brightness(.9)}
@@ -765,39 +769,61 @@ body{background:#0f1e2d;color:#e8f0f8}
 
 <!-- CELEBRATE -->
 <div class="screen" id="screen-celebrate">
-  <div class="sec-hdr" style="background:var(--gbj)">
-    <span style="font-size:28px">🎉</span>
-    <div><div class="sec-hdr-title">Celebrate</div><div class="sec-hdr-sub">Track what God is doing this week</div></div>
+  <div class="cel-header">
+    <button class="cel-back-btn" onclick="switchTab('home')">←</button>
+    <div>
+      <div class="cel-title">CELEBRATE</div>
+      <div class="cel-subtitle">Track what God is doing this week</div>
+    </div>
   </div>
-  <div class="sl" style="margin-top:4px">What would you like to do?</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
-    <button onclick="handleFollowUpTap()" style="background:var(--go);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">🔄</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Follow-Up</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Record a contact or encounter</span>
+  <div class="tile-grid">
+    <button class="tile" style="background:var(--orange)" onclick="handleFollowUpTap()" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <svg class="tile-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      <div class="tile-label">Follow-Up</div>
+      <div class="tile-sub">Log a contact</div>
     </button>
-    <button onclick="switchTab('tally')" style="background:var(--gi);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">📊</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Daily Tally</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Submit today's counts</span>
+    <button class="tile" style="background:var(--indigo)" onclick="switchTab('tally')" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <svg class="tile-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <div class="tile-label">Daily Tally</div>
+      <div class="tile-sub">Submit today's counts</div>
     </button>
-    <button onclick="switchTab('summary');buildSummary()" style="background:var(--gbj);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">📈</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Summary</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Totals &amp; full report</span>
+    <button class="tile" style="background:var(--mid-blue)" onclick="switchTab('summary');buildSummary()" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <svg class="tile-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      <div class="tile-label">Summary</div>
+      <div class="tile-sub">Totals &amp; full report</div>
     </button>
-    <button onclick="switchTab('feedback')" style="background:var(--gbl);border:none;border-radius:14px;padding:20px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
-      <span style="font-size:32px;line-height:1">📝</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:.3px">Feedback</span>
-      <span style="font-family:'Montserrat',sans-serif;font-size:10px;color:rgba(255,255,255,.8);font-weight:500">Post-trip survey</span>
+    <button class="tile" style="background:var(--blue-jeans)" onclick="switchTab('feedback')" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">
+      <svg class="tile-icon" viewBox="0 0 24 24" fill="none" stroke="var(--indigo)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      <div class="tile-label" style="color:var(--indigo)">Feedback</div>
+      <div class="tile-sub" style="color:rgba(27,69,106,.6)">Post-trip survey</div>
     </button>
   </div>
-  <div class="sl" style="margin-top:28px">This Week's Counts</div>
-  <div class="sr">
-    <div class="sc"><div class="sv" id="stat-gospel2">0</div><div class="sk">Gospel</div></div>
-    <div class="sc"><div class="sv" id="stat-pop2">0</div><div class="sk">P.O.P.</div></div>
-    <div class="sc"><div class="sv" id="stat-prayer2">0</div><div class="sk">Prayer</div></div>
-    <div class="sc"><div class="sv" id="stat-salvation2">0</div><div class="sk">Decisions</div></div>
+  <div class="tally-card">
+    <div class="tally-header">
+      <span class="tally-title">This Week's Count</span>
+      <span class="tally-viewall" onclick="switchTab('summary');buildSummary()">Full summary →</span>
+    </div>
+    <div class="tally-stats">
+      <div class="tally-stat">
+        <div class="tally-num" id="stat-gospel2">0</div>
+        <div class="tally-lbl">Gospel</div>
+      </div>
+      <div class="tally-divider"></div>
+      <div class="tally-stat">
+        <div class="tally-num" id="stat-pop2">0</div>
+        <div class="tally-lbl">P.O.P.</div>
+      </div>
+      <div class="tally-divider"></div>
+      <div class="tally-stat">
+        <div class="tally-num" id="stat-prayer2">0</div>
+        <div class="tally-lbl">Prayer</div>
+      </div>
+      <div class="tally-divider"></div>
+      <div class="tally-stat">
+        <div class="tally-num" id="stat-salvation2">0</div>
+        <div class="tally-lbl">Decisions</div>
+      </div>
+    </div>
   </div>
 </div>
 
