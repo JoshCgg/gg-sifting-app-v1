@@ -95,6 +95,11 @@ body{font-family:'Montserrat',sans-serif;background:var(--bright-gray);color:var
 .fu-divider{height:1px;background:#f0f0f0}
 .fu-logger-card{border-left:3px solid var(--blue-jeans)}
 .fu-logger-label{font-size:10px;font-weight:700;color:var(--blue-jeans);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px}
+.confirm-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:1000}
+.confirm-card{background:#fff;border-radius:20px;max-width:340px;width:90%;padding:28px 24px;text-align:center}
+.confirm-title{font-family:var(--font-display);font-size:18px;color:var(--indigo);margin-bottom:6px}
+.confirm-summary{font-size:14px;color:#7a8fa0;margin-bottom:14px}
+.confirm-body{font-size:13px;color:#5a6a7a;line-height:1.7;margin-bottom:22px}
 .bp{width:100%;padding:14px;background:var(--gi);color:#fff;border:none;border-radius:var(--r);font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;letter-spacing:.5px;cursor:pointer;transition:background .2s,transform .1s;text-transform:uppercase}
 .bp:active{transform:scale(.98)}
 .bp.o{background:var(--go)}
@@ -926,7 +931,7 @@ body{background:#0f1e2d;color:#e8f0f8}
       <div class="fg"><label class="fl">Your Name</label><input type="text" class="fi" id="logger-name" placeholder="Your name"></div>
       <div class="fg" style="margin-bottom:0"><label class="fl">Your Phone</label><input type="text" class="fi" id="logger-phone" placeholder="Your phone number"></div>
     </div>
-    <button class="bp" style="background:var(--orange);border-radius:12px;font-family:var(--font-display);font-size:16px;margin-bottom:8px" onclick="submitContact()">Review &amp; Send Contact</button>
+    <button class="bp" style="background:var(--orange);border-radius:12px;font-family:var(--font-display);font-size:16px;margin-bottom:8px" onclick="showContactModal()">Review &amp; Send Contact</button>
   </div>
   <div id="log-success-view" class="ss" style="display:none">
     <div class="ss-icon">✅</div>
@@ -1010,6 +1015,17 @@ body{background:#0f1e2d;color:#e8f0f8}
   <button class="tab-btn" id="tab-celebrate" onclick="switchTab('celebrate')">
     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Celebrate
   </button>
+</div>
+
+<!-- CONTACT CONFIRM MODAL -->
+<div class="confirm-overlay" id="contact-confirm-modal">
+  <div class="confirm-card">
+    <div class="confirm-title">Ready to Send?</div>
+    <div class="confirm-summary" id="confirm-summary"></div>
+    <div class="confirm-body">Double-check the details above are correct. Once sent, this contact is saved to your team's record.</div>
+    <button class="bp" style="background:var(--orange);border-radius:12px;font-family:var(--font-display);font-size:16px;margin-bottom:10px" onclick="document.getElementById('contact-confirm-modal').style.display='none';submitContact()">Send Contact</button>
+    <button class="bs" onclick="document.getElementById('contact-confirm-modal').style.display='none'">Go back and edit</button>
+  </div>
 </div>
 
 <!-- WEEK MODAL (change week — intentional only) -->
@@ -1443,6 +1459,7 @@ function buildPG(){
 
 // ─── Modals / Toast ───────────────────────────────────────────────────────────
 function closeModal(id){document.getElementById(id).classList.remove('show');}
+function showContactModal(){const n=gv('contact-name')||'(no name)';const l=gv('contact-lang')||'(no language)';document.getElementById('confirm-summary').textContent=n+' — '+l;document.getElementById('contact-confirm-modal').style.display='flex';}
 function showInstall(){document.getElementById('install-modal').classList.add('show');}
 function showToast(msg){
   const t=document.getElementById('toast');
