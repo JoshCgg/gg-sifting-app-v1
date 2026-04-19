@@ -962,15 +962,115 @@ body{background:#0f2a40;color:#e8f0f8}
 
 <!-- FEEDBACK (sub-screen) -->
 <div class="screen" id="screen-feedback">
-  <div class="back-bar" onclick="switchTab('celebrate')">
-    <svg width="18" height="18" fill="none" stroke="white" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-    <div><div class="back-bar-label">← Back to Celebrate</div><div class="back-bar-sub">Feedback</div></div>
+  <div class="cel-header">
+    <button class="cel-back-btn" onclick="switchTab('celebrate')">←</button>
+    <div>
+      <div class="cel-title">FEEDBACK</div>
+      <div class="cel-subtitle">Sifting Week Reflections</div>
+    </div>
   </div>
-  <div class="card" style="text-align:center;padding:36px 24px;border-left:4px solid var(--gbl)">
-    <div style="font-size:48px;margin-bottom:16px">📝</div>
-    <div style="font-size:17px;font-weight:700;color:var(--gi);margin-bottom:10px">Post-Trip Survey</div>
-    <div style="font-size:13px;color:#7a8fa0;line-height:1.7;margin-bottom:20px">Your feedback helps Global Gates improve every Sifting Week.</div>
-    <button onclick="handleSurveyTap()" style="width:100%;background:#F38E53;border:none;border-radius:12px;padding:14px 20px;cursor:pointer;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;color:#fff;letter-spacing:.3px;transition:filter .1s" ontouchstart="this.style.filter='brightness(.88)'" ontouchend="this.style.filter=''">Take the Survey</button>
+
+  <div id="survey-form-view">
+    <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px">
+
+      <div class="fu-field">
+        <label class="fl">Your Name</label>
+        <input type="text" class="fi" id="survey-name" placeholder="First and last name">
+      </div>
+      <div class="fu-divider"></div>
+
+      <div class="fu-field">
+        <label class="fl">Your Email</label>
+        <input type="email" class="fi" id="survey-email" placeholder="your@email.com">
+      </div>
+      <div class="fu-divider"></div>
+
+      <div class="fu-field">
+        <label class="fl">What would you change to make Sifting Week more effective?</label>
+        <textarea class="ft" id="survey-change" placeholder="Your thoughts..."></textarea>
+      </div>
+      <div class="fu-divider"></div>
+
+      <div class="fu-field">
+        <label class="fl">Did you complete the pre-trip assignments?</label>
+        <div class="tg" id="survey-pretrip">
+          <div class="to" data-val="yes" onclick="ST(this,'survey-pretrip')">Yes</div>
+          <div class="to" data-val="partial" onclick="ST(this,'survey-pretrip')">Partially</div>
+          <div class="to" data-val="no" onclick="ST(this,'survey-pretrip')">No</div>
+        </div>
+      </div>
+      <div class="fu-divider"></div>
+
+      <div class="fu-field">
+        <label class="fl">If yes, how can we improve the pre-trip assignments?</label>
+        <textarea class="ft" id="survey-pretrip-improve" placeholder="Optional feedback..."></textarea>
+      </div>
+      <div class="fu-divider"></div>
+
+      <div class="fu-field">
+        <label class="fl">How many times did you share the gospel this week?</label>
+        <input type="number" class="fi" id="survey-gospel-count" placeholder="0" min="0" style="max-width:120px">
+      </div>
+      <div class="fu-divider"></div>
+
+      <div class="fu-field">
+        <label class="fl">What training was most helpful to you this week?</label>
+        <textarea class="ft" id="survey-most-helpful" placeholder="Your thoughts..."></textarea>
+      </div>
+      <div class="fu-divider"></div>
+
+      <div class="fu-field">
+        <label class="fl">What training was least helpful to you this week?</label>
+        <textarea class="ft" id="survey-least-helpful" placeholder="Your thoughts..."></textarea>
+      </div>
+      <div class="fu-divider"></div>
+
+      <div class="fu-field">
+        <label class="fl">Who from your relationship map has God impressed upon you to share Christ with in the next week?</label>
+        <textarea class="ft" id="survey-rel-map" placeholder="Name(s) or description..."></textarea>
+      </div>
+      <div class="fu-divider"></div>
+
+      <div class="fu-field">
+        <label class="fl">Who will you train in 411 in the next week?</label>
+        <textarea class="ft" id="survey-train411" placeholder="Name(s) or description..."></textarea>
+      </div>
+      <div class="fu-divider"></div>
+
+      <div class="fu-field">
+        <label class="fl">Anything else you would like to share?</label>
+        <textarea class="ft" id="survey-other" placeholder="Optional..."></textarea>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-size:12px;font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">I would like to partner with Global Gates by:</div>
+      <div id="survey-partnership-list">
+        <div class="chi" onclick="toggleCheck(this)"><div class="chb"></div><div class="cht">Praying with you. Please send updates to my email above.</div></div>
+        <div class="chi" onclick="toggleCheck(this)"><div class="chb"></div><div class="cht">Investing in you. Please contact me about how I can give financially to a ministry.</div></div>
+        <div class="chi" onclick="toggleCheck(this)"><div class="chb"></div><div class="cht">Going with you. Please send me information about short-term mission opportunities with Global Gates.</div></div>
+        <div class="chi" onclick="toggleCheck(this)"><div class="chb"></div><div class="cht">Going with you. Please send me information about long-term mission opportunities with Global Gates.</div></div>
+        <div class="chi" onclick="toggleCheck(this)"><div class="chb"></div><div class="cht">Going with you. Please send me information about internship opportunities with Global Gates.</div></div>
+      </div>
+    </div>
+
+    <div class="card" id="survey-prayer-updates-card" style="margin-bottom:12px;display:none">
+      <div style="font-size:12px;font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">I would like to receive prayer updates from:</div>
+      <div style="font-size:11px;color:#8a9aab;margin-bottom:12px">Select anyone whose ministry you'd like to follow and pray for.</div>
+      <div id="survey-prayer-updates-list"></div>
+    </div>
+
+    <button class="bp" style="background:var(--orange);border-radius:12px;font-family:var(--font-display);font-size:16px;margin-bottom:8px" onclick="submitSurvey()">Submit Reflection</button>
+    <button class="bs" onclick="switchTab('celebrate')" style="margin-bottom:24px">Cancel</button>
+  </div>
+
+  <div id="survey-success-view" class="ss" style="display:none">
+    <div class="ss-icon">🙏</div>
+    <div class="ss-title">Thank You!</div>
+    <div class="ss-sub">Your reflection has been submitted. We're grateful you served with us this week.</div>
+    <div style="margin-top:24px">
+      <button class="bp" onclick="switchTab('celebrate')">Back to Celebrate</button>
+    </div>
   </div>
 </div>
 
@@ -1192,11 +1292,90 @@ function switchTab(tab){
 }
 
 function handleSurveyTap(){
-  var week=ST8.currentWeek;
-  if(week&&week.survey&&week.survey.type==='link'&&week.survey.url){
-    window.open(week.survey.url,'_blank');
-  }else{
-    showCelebrateSub('feedback');
+  var week = ST8.currentWeek;
+  if(week && week.survey && week.survey.type === 'link' && week.survey.url){
+    window.open(week.survey.url, '_blank');
+  } else {
+    switchTab('feedback');
+    buildSurveyPrayerUpdates();
+  }
+}
+
+function buildSurveyPrayerUpdates(){
+  var options = [];
+  try {
+    options = (ST8.currentWeek.survey && ST8.currentWeek.survey.newsletterOptions) || [];
+  } catch(e) {}
+  var card = document.getElementById('survey-prayer-updates-card');
+  var list = document.getElementById('survey-prayer-updates-list');
+  if(!options.length){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  list.innerHTML = options.map(function(o){
+    return '<div class="chi" onclick="toggleCheck(this)" data-email="' + (o.email||'') + '">'
+      + '<div class="chb"></div>'
+      + '<div class="cht">' + (o.name||'') + '</div>'
+      + '</div>';
+  }).join('');
+}
+
+async function submitSurvey(){
+  var name = gv('survey-name');
+  var email = gv('survey-email');
+  if(!name){ showToast('Please enter your name'); return; }
+  if(!email){ showToast('Please enter your email'); return; }
+
+  var partnershipChecks = [];
+  document.querySelectorAll('#survey-partnership-list .chi').forEach(function(row){
+    if(row.querySelector('.chb.ck')){
+      partnershipChecks.push(row.querySelector('.cht').textContent.trim());
+    }
+  });
+
+  var prayerSignups = [];
+  document.querySelectorAll('#survey-prayer-updates-list .chi').forEach(function(row){
+    if(row.querySelector('.chb.ck')){
+      prayerSignups.push({
+        name: row.querySelector('.cht').textContent.trim(),
+        email: row.getAttribute('data-email') || ''
+      });
+    }
+  });
+
+  var surveyData = {
+    weekId: ST8.currentWeek.id || null,
+    codeWord: ST8.currentWeek.code || '',
+    submittedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    name: name,
+    email: email,
+    whatWouldYouChange: gv('survey-change'),
+    didPretrip: GS('survey-pretrip'),
+    pretripImprovements: gv('survey-pretrip-improve'),
+    gospelShareCount: parseInt(document.getElementById('survey-gospel-count').value) || 0,
+    mostHelpfulTraining: gv('survey-most-helpful'),
+    leastHelpfulTraining: gv('survey-least-helpful'),
+    relationshipMapName: gv('survey-rel-map'),
+    willTrain411: gv('survey-train411'),
+    anythingElse: gv('survey-other'),
+    partnershipInterests: partnershipChecks,
+    prayerUpdateSignups: prayerSignups,
+    clientDate: new Date().toLocaleDateString(),
+    clientTime: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})
+  };
+
+  var btn = document.querySelector('#survey-form-view .bp');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  try {
+    await db.collection('surveyResponses').add(surveyData);
+    document.getElementById('survey-form-view').style.display = 'none';
+    document.getElementById('survey-success-view').style.display = 'block';
+    window.scrollTo(0,0);
+  } catch(err) {
+    console.warn('Survey submit failed:', err.message);
+    showToast('Could not submit — check your connection and try again.');
+    btn.disabled = false;
+    btn.textContent = 'Submit Reflection';
   }
 }
 
