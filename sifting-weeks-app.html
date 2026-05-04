@@ -332,24 +332,24 @@ body{background:#0f2a40;color:#e8f0f8}
       <span class="tally-title">This Week's Count</span>
       <span class="tally-viewall" onclick="switchTab('celebrate')">View all →</span>
     </div>
-    <div class="tally-stats">
+    <div class="tally-stats" id="home-stats-card">
       <div class="tally-stat">
-        <div class="tally-num" id="stat-gospel">0</div>
+        <div class="tally-num">0</div>
         <div class="tally-lbl">Gospel</div>
       </div>
       <div class="tally-divider"></div>
       <div class="tally-stat">
-        <div class="tally-num" id="stat-prayer">0</div>
+        <div class="tally-num">0</div>
         <div class="tally-lbl">Prayer</div>
       </div>
       <div class="tally-divider"></div>
       <div class="tally-stat">
-        <div class="tally-num" id="stat-bibles">0</div>
+        <div class="tally-num">0</div>
         <div class="tally-lbl">Bibles</div>
       </div>
       <div class="tally-divider"></div>
       <div class="tally-stat">
-        <div class="tally-num" id="stat-followups">0</div>
+        <div class="tally-num">0</div>
         <div class="tally-lbl">Follow-ups</div>
       </div>
     </div>
@@ -1494,50 +1494,56 @@ function getCheckedTexts(cid){
 function AC(key,d){ST8.counters[key]=Math.max(0,(ST8.counters[key]||0)+d);updateCUI();save();}
 function updateCUI(){for(const k in ST8.counters){const e=document.getElementById('cnt-'+k);if(e)e.textContent=ST8.counters[k];}}
 function updateStats() {
-  const elGospel    = document.getElementById('stat-gospel2');
-  const elPop       = document.getElementById('stat-pop2');
-  const elPrayer    = document.getElementById('stat-prayer2');
-  const elSalvation = document.getElementById('stat-salvation2');
-  const elGospelHome    = document.getElementById('stat-gospel');
-  const elPrayerHome    = document.getElementById('stat-prayer');
-  const elBiblesHome    = document.getElementById('stat-bibles');
-  const elFollowupsHome = document.getElementById('stat-followups');
-
   const week = ST8.currentWeek;
-  if (!week || !week.id) {
-    if (elGospel)        elGospel.textContent        = '0';
-    if (elPop)           elPop.textContent           = '0';
-    if (elPrayer)        elPrayer.textContent        = '0';
-    if (elSalvation)     elSalvation.textContent     = '0';
-    if (elGospelHome)    elGospelHome.textContent    = '0';
-    if (elPrayerHome)    elPrayerHome.textContent    = '0';
-    if (elBiblesHome)    elBiblesHome.textContent    = '0';
-    if (elFollowupsHome) elFollowupsHome.textContent = '0';
-    return;
-  }
+  if (!week || !week.id) return;
+
   firebase.auth().onAuthStateChanged(user => {
     if (!user) return;
     db.collection('tallies')
       .where('weekId', '==', week.id)
       .get()
       .then(snap => {
-        let gospel = 0, pop = 0, prayer = 0, salvation = 0;
+        // Build totals dynamically from all tally docs
+        const totals = {};
         snap.forEach(doc => {
           const d = doc.data();
-          gospel    += d.gospel              || 0;
-          pop       += d.pop                 || 0;
-          prayer    += d.prayer              || 0;
-          salvation += (d.salvations || d.pof || 0);
+          Object.keys(d).forEach(k => {
+            if (typeof d[k] === 'number') {
+              totals[k] = (totals[k] || 0) + d[k];
+            }
+          });
         });
-        console.log('Stats loaded — gospel:', gospel, 'prayer:', prayer, 'salvation:', salvation);
-        if (elGospel)        elGospel.textContent        = gospel;
-        if (elPop)           elPop.textContent           = pop;
-        if (elPrayer)        elPrayer.textContent        = prayer;
-        if (elSalvation)     elSalvation.textContent     = salvation;
-        if (elGospelHome)    elGospelHome.textContent    = gospel;
-        if (elPrayerHome)    elPrayerHome.textContent    = prayer;
-        if (elBiblesHome)    elBiblesHome.textContent    = 0;
-        if (elFollowupsHome) elFollowupsHome.textContent = salvation;
+
+        // Update Celebrate tab fixed stats
+        const elGospel2 = document.getElementById('stat-gospel2');
+        const elPop2 = document.getElementById('stat-pop2');
+        const elPrayer2 = document.getElementById('stat-prayer2');
+        const elSalvation2 = document.getElementById('stat-salvation2');
+        if (elGospel2) elGospel2.textContent = totals.gospel || 0;
+        if (elPop2) elPop2.textContent = totals.pop || 0;
+        if (elPrayer2) elPrayer2.textContent = totals.prayer || 0;
+        if (elSalvation2) elSalvation2.textContent =
+          (totals.salvations || 0) + (totals.pof || 0);
+
+        // Update home screen stats dynamically from week's tallyFields
+        const homeCard = document.getElementById('home-stats-card');
+        if (homeCard && week.tallyFields) {
+          const activeFields = week.tallyFields.filter(f => f.active);
+          homeCard.innerHTML = activeFields.map(f => {
+            const val = totals[f.id] || 0;
+            return `
+              <div class="tally-stat">
+                <div class="tally-num">${val}</div>
+                <div class="tally-lbl">${f.label}</div>
+              </div>
+              <div class="tally-divider"></div>`;
+          }).join('');
+          // Remove last divider
+          const dividers = homeCard.querySelectorAll('.tally-divider');
+          if (dividers.length) dividers[dividers.length - 1].remove();
+        }
+
+        console.log('Stats loaded:', JSON.stringify(totals));
       })
       .catch(e => console.error('Stats query failed:', e));
   });
