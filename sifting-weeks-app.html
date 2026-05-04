@@ -1483,13 +1483,35 @@ function getCheckedTexts(cid){
 }
 
 // ─── Counters ─────────────────────────────────────────────────────────────────
-function AC(key,d){ST8.counters[key]=Math.max(0,(ST8.counters[key]||0)+d);updateCUI();updateStats();save();}
+function AC(key,d){ST8.counters[key]=Math.max(0,(ST8.counters[key]||0)+d);updateCUI();save();}
 function updateCUI(){for(const k in ST8.counters){const e=document.getElementById('cnt-'+k);if(e)e.textContent=ST8.counters[k];}}
-function updateStats(){
-  ['stat-gospel','stat-gospel2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=ST8.counters.gospel||0;});
-  ['stat-pop','stat-pop2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=ST8.counters.pop||0;});
-  ['stat-prayer','stat-prayer2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=ST8.counters.prayer||0;});
-  ['stat-salvation','stat-salvation2'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=ST8.counters.salvations||0;});
+function updateStats() {
+  const week = ST8.currentWeek;
+  if (!week || !week.id) {
+    document.getElementById('stat-gospel').textContent = '0';
+    document.getElementById('stat-pop').textContent = '0';
+    document.getElementById('stat-prayer').textContent = '0';
+    document.getElementById('stat-salvation').textContent = '0';
+    return;
+  }
+  db.collection('tallies')
+    .where('weekId', '==', week.id)
+    .get()
+    .then(snap => {
+      let gospel = 0, pop = 0, prayer = 0, salvation = 0;
+      snap.forEach(doc => {
+        const d = doc.data();
+        gospel    += d.gospel              || 0;
+        pop       += d.pop                 || 0;
+        prayer    += d.prayer              || 0;
+        salvation += (d.salvations || d.pof || 0);
+      });
+      document.getElementById('stat-gospel').textContent    = gospel;
+      document.getElementById('stat-pop').textContent       = pop;
+      document.getElementById('stat-prayer').textContent    = prayer;
+      document.getElementById('stat-salvation').textContent = salvation;
+    })
+    .catch(e => console.error('Stats query failed:', e));
 }
 function updateNav(){
   document.getElementById('header-week-name').textContent=ST8.currentWeek.name;
