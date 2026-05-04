@@ -1333,7 +1333,7 @@ function loadState(){
     if(s.loggerName&&document.getElementById('logger-name'))document.getElementById('logger-name').value=s.loggerName;
     if(s.loggerPhone&&document.getElementById('logger-phone'))document.getElementById('logger-phone').value=s.loggerPhone;
   }catch(e){}
-  updateNav();updateCUI();updateStats();renderContacts();buildPG();renderTallyCounters();applyModuleVisibility();
+  updateNav();updateCUI();renderContacts();buildPG();renderTallyCounters();applyModuleVisibility();
 }
 function save(){
   try{localStorage.setItem('gg_v3',JSON.stringify({cw:ST8.currentWeek,wks:ST8.weeks,cnt:ST8.counters,con:ST8.contacts}));}catch(e){}
@@ -1494,7 +1494,6 @@ function getCheckedTexts(cid){
 function AC(key,d){ST8.counters[key]=Math.max(0,(ST8.counters[key]||0)+d);updateCUI();save();}
 function updateCUI(){for(const k in ST8.counters){const e=document.getElementById('cnt-'+k);if(e)e.textContent=ST8.counters[k];}}
 function updateStats() {
-  console.log('updateStats called, weekId:', ST8.currentWeek && ST8.currentWeek.id);
   const week = ST8.currentWeek;
   if (!week || !week.id) {
     document.getElementById('stat-gospel').textContent = '0';
@@ -1503,25 +1502,28 @@ function updateStats() {
     document.getElementById('stat-salvation').textContent = '0';
     return;
   }
-  db.collection('tallies')
-    .where('weekId', '==', week.id)
-    .get()
-    .then(snap => {
-      let gospel = 0, pop = 0, prayer = 0, salvation = 0;
-      snap.forEach(doc => {
-        const d = doc.data();
-        gospel    += d.gospel              || 0;
-        pop       += d.pop                 || 0;
-        prayer    += d.prayer              || 0;
-        salvation += (d.salvations || d.pof || 0);
-      });
-      console.log('Firestore stats result — gospel:', gospel, 'prayer:', prayer, 'salvation:', salvation);
-      document.getElementById('stat-gospel').textContent    = gospel;
-      document.getElementById('stat-pop').textContent       = pop;
-      document.getElementById('stat-prayer').textContent    = prayer;
-      document.getElementById('stat-salvation').textContent = salvation;
-    })
-    .catch(e => console.error('Stats query failed:', e));
+  firebase.auth().onAuthStateChanged(user => {
+    if (!user) return;
+    db.collection('tallies')
+      .where('weekId', '==', week.id)
+      .get()
+      .then(snap => {
+        let gospel = 0, pop = 0, prayer = 0, salvation = 0;
+        snap.forEach(doc => {
+          const d = doc.data();
+          gospel    += d.gospel     || 0;
+          pop       += d.pop        || 0;
+          prayer    += d.prayer     || 0;
+          salvation += (d.salvations || d.pof || 0);
+        });
+        console.log('Stats loaded — gospel:', gospel, 'prayer:', prayer, 'salvation:', salvation);
+        document.getElementById('stat-gospel').textContent    = gospel;
+        document.getElementById('stat-pop').textContent       = pop;
+        document.getElementById('stat-prayer').textContent    = prayer;
+        document.getElementById('stat-salvation').textContent = salvation;
+      })
+      .catch(e => console.error('Stats query failed:', e));
+  });
 }
 function updateNav(){
   document.getElementById('header-week-name').textContent=ST8.currentWeek.name;
