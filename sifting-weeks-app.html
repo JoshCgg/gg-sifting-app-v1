@@ -1494,12 +1494,17 @@ function getCheckedTexts(cid){
 function AC(key,d){ST8.counters[key]=Math.max(0,(ST8.counters[key]||0)+d);updateCUI();save();}
 function updateCUI(){for(const k in ST8.counters){const e=document.getElementById('cnt-'+k);if(e)e.textContent=ST8.counters[k];}}
 function updateStats() {
+  const elGospel   = document.getElementById('stat-gospel2');
+  const elPop      = document.getElementById('stat-pop2');
+  const elPrayer   = document.getElementById('stat-prayer2');
+  const elSalvation = document.getElementById('stat-salvation2');
+
   const week = ST8.currentWeek;
   if (!week || !week.id) {
-    document.getElementById('stat-gospel').textContent = '0';
-    document.getElementById('stat-pop').textContent = '0';
-    document.getElementById('stat-prayer').textContent = '0';
-    document.getElementById('stat-salvation').textContent = '0';
+    if (elGospel)    elGospel.textContent    = '0';
+    if (elPop)       elPop.textContent       = '0';
+    if (elPrayer)    elPrayer.textContent     = '0';
+    if (elSalvation) elSalvation.textContent  = '0';
     return;
   }
   firebase.auth().onAuthStateChanged(user => {
@@ -1511,16 +1516,16 @@ function updateStats() {
         let gospel = 0, pop = 0, prayer = 0, salvation = 0;
         snap.forEach(doc => {
           const d = doc.data();
-          gospel    += d.gospel     || 0;
-          pop       += d.pop        || 0;
-          prayer    += d.prayer     || 0;
+          gospel    += d.gospel              || 0;
+          pop       += d.pop                 || 0;
+          prayer    += d.prayer              || 0;
           salvation += (d.salvations || d.pof || 0);
         });
         console.log('Stats loaded — gospel:', gospel, 'prayer:', prayer, 'salvation:', salvation);
-        document.getElementById('stat-gospel').textContent    = gospel;
-        document.getElementById('stat-pop').textContent       = pop;
-        document.getElementById('stat-prayer').textContent    = prayer;
-        document.getElementById('stat-salvation').textContent = salvation;
+        if (elGospel)    elGospel.textContent    = gospel;
+        if (elPop)       elPop.textContent       = pop;
+        if (elPrayer)    elPrayer.textContent     = prayer;
+        if (elSalvation) elSalvation.textContent  = salvation;
       })
       .catch(e => console.error('Stats query failed:', e));
   });
