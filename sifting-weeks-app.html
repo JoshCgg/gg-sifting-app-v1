@@ -618,7 +618,7 @@ body{background:#0f2a40;color:#e8f0f8}
       <div class="cel-subtitle">Prayer walking &amp; spiritual power</div>
     </div>
   </div>
-  <div class="rc i" onclick="toggleRC(this)">
+  <div class="rc i" onclick="toggleRC(this)" data-module-id="prayer-walking">
     <div class="rc-icon">🚶</div><div class="rc-title">Prayer Walking Guide</div>
     <div class="rc-desc">Praying on-site with insight for your specific area</div>
     <div class="rc-body">
@@ -657,7 +657,7 @@ body{background:#0f2a40;color:#e8f0f8}
       <p>Note where prayer feels heavy or blocked — report it to your team leader. Take breaks — this is spiritually exhausting work.</p>
     </div>
   </div>
-  <div class="rc" onclick="toggleRC(this)">
+  <div class="rc" onclick="toggleRC(this)" data-module-id="holy-spirit">
     <div class="rc-icon">⚡</div><div class="rc-title">Holy Spirit's Power — John 14:12</div>
     <div class="rc-desc">Why you can do greater things than you think</div>
     <div class="rc-body">
@@ -692,7 +692,7 @@ body{background:#0f2a40;color:#e8f0f8}
       <div class="cel-subtitle">Gospel tools · Discipleship · Quick references</div>
     </div>
   </div>
-  <div class="rc i" onclick="toggleRC(this)">
+  <div class="rc i" onclick="toggleRC(this)" data-module-id="three-circles">
     <div class="rc-icon">✝️</div><div class="rc-title">3 Circles Gospel Presentation</div>
     <div class="rc-desc">Visual gospel tool that crosses language barriers</div>
     <div class="rc-body">
@@ -741,7 +741,7 @@ body{background:#0f2a40;color:#e8f0f8}
       <div class="scr">"Behold, the Lamb of God, who takes away the sin of the world!" — John 1:29</div>
     </div>
   </div>
-  <div class="rc o" onclick="toggleRC(this)">
+  <div class="rc o" onclick="toggleRC(this)" data-module-id="house-of-peace">
     <div class="rc-icon">🏠</div><div class="rc-title">House of Peace Search — Luke 10</div>
     <div class="rc-desc">Finding Persons of Peace door-to-door</div>
     <div class="rc-body">
@@ -773,7 +773,7 @@ body{background:#0f2a40;color:#e8f0f8}
       </ul>
     </div>
   </div>
-  <div class="rc m" onclick="toggleRC(this)">
+  <div class="rc m" onclick="toggleRC(this)" data-module-id="411-tool">
     <div class="rc-icon">📖</div><div class="rc-title">411 Discipleship Tool</div>
     <div class="rc-desc">4 questions · 1 paper · 1 hour — for new disciples</div>
     <div class="rc-body">
@@ -1096,17 +1096,7 @@ body{background:#0f2a40;color:#e8f0f8}
       <div class="cel-subtitle">Enter today's counts</div>
     </div>
   </div>
-  <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px">
-    <div class="cr"><div><div class="cl">Doors Knocked</div><div class="cls">Total homes visited</div></div><div class="cc"><button class="cb m" onclick="AC('doors',-1)">−</button><div class="cv" id="cnt-doors">0</div><button class="cb p" onclick="AC('doors',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Gospel Presentations</div><div class="cls">Full 3 Circles shared</div></div><div class="cc"><button class="cb m" onclick="AC('gospel',-1)">−</button><div class="cv" id="cnt-gospel">0</div><button class="cb p" onclick="AC('gospel',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Prayer Conversations</div><div class="cls">Prayed with someone</div></div><div class="cc"><button class="cb m" onclick="AC('prayer',-1)">−</button><div class="cv" id="cnt-prayer">0</div><button class="cb p" onclick="AC('prayer',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">People of Peace Found</div><div class="cls">All 3 POP indicators met</div></div><div class="cc"><button class="cb m" onclick="AC('pop',-1)">−</button><div class="cv" id="cnt-pop">0</div><button class="cb p" onclick="AC('pop',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Jesus Films Given</div><div class="cls">Films distributed today</div></div><div class="cc"><button class="cb m" onclick="AC('films',-1)">−</button><div class="cv" id="cnt-films">0</div><button class="cb p" onclick="AC('films',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Bible Studies Scheduled</div><div class="cls">Follow-up study set up</div></div><div class="cc"><button class="cb m" onclick="AC('studies',-1)">−</button><div class="cv" id="cnt-studies">0</div><button class="cb p" onclick="AC('studies',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Salvations / Decisions</div><div class="cls">Prayed to receive Christ</div></div><div class="cc"><button class="cb m" onclick="AC('salvations',-1)">−</button><div class="cv" id="cnt-salvations">0</div><button class="cb p" onclick="AC('salvations',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Gospel Booklets / Tracts</div><div class="cls">Literature distributed today</div></div><div class="cc"><button class="cb m" onclick="AC('booklets',-1)">−</button><div class="cv" id="cnt-booklets">0</div><button class="cb p" onclick="AC('booklets',1)">+</button></div></div>
-    <div class="cr"><div><div class="cl">Info Cards</div><div class="cls">Cards given out today</div></div><div class="cc"><button class="cb m" onclick="AC('infocards',-1)">−</button><div class="cv" id="cnt-infocards">0</div><button class="cb p" onclick="AC('infocards',1)">+</button></div></div>
-  </div>
+  <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px" id="tally-counters-card"></div>
   <div class="card" style="margin-bottom:16px">
     <div class="fg" style="margin-bottom:0"><label class="fl">Team Name</label><input type="text" class="fi" id="tally-team" placeholder="Your team's name"></div>
   </div>
@@ -1276,6 +1266,51 @@ const ST8={
 const CELEBRATE_SUBS=['log','tally','summary','feedback'];
 
 // ─── Persistence ──────────────────────────────────────────────────────────────
+function renderTallyCounters() {
+  const card = document.getElementById('tally-counters-card');
+  if (!card) return;
+  const week = ST8.currentWeek;
+
+  const defaultFields = [
+    {id:'gospel', label:'Gospel Presentations'},
+    {id:'prayer', label:'Prayer Conversations'},
+    {id:'salvations', label:'Professions of Faith'},
+    {id:'pop', label:'Persons of Peace'}
+  ];
+
+  let fields = defaultFields;
+  if (week && week.tallyFields && week.tallyFields.length) {
+    fields = week.tallyFields.filter(f => f.active);
+  }
+
+  if (!fields.length) {
+    card.innerHTML = '<div style="padding:16px;font-size:13px;color:#7a8fa0">No tally fields configured for this week.</div>';
+    return;
+  }
+
+  card.innerHTML = fields.map(f => {
+    const key = f.id;
+    const val = ST8.counters[key] || 0;
+    return `<div class="cr">
+      <div><div class="cl">${f.label}</div></div>
+      <div class="cc">
+        <button class="cb m" onclick="AC('${key}',-1)">−</button>
+        <div class="cv" id="cnt-${key}">${val}</div>
+        <button class="cb p" onclick="AC('${key}',1)">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function applyModuleVisibility() {
+  const active = (ST8.currentWeek && ST8.currentWeek.activeModules) || [];
+  if (!active.length) return;
+  document.querySelectorAll('[data-module-id]').forEach(el => {
+    const mid = el.getAttribute('data-module-id');
+    el.style.display = active.includes(mid) ? '' : 'none';
+  });
+}
+
 function loadState(){
   try{
     const s=JSON.parse(localStorage.getItem('gg_v3')||'{}');
@@ -1290,7 +1325,7 @@ function loadState(){
     if(s.loggerName&&document.getElementById('logger-name'))document.getElementById('logger-name').value=s.loggerName;
     if(s.loggerPhone&&document.getElementById('logger-phone'))document.getElementById('logger-phone').value=s.loggerPhone;
   }catch(e){}
-  updateNav();updateCUI();updateStats();renderContacts();buildPG();
+  updateNav();updateCUI();updateStats();renderContacts();buildPG();renderTallyCounters();applyModuleVisibility();
 }
 function save(){
   try{localStorage.setItem('gg_v3',JSON.stringify({cw:ST8.currentWeek,wks:ST8.weeks,cnt:ST8.counters,con:ST8.contacts}));}catch(e){}
@@ -1480,10 +1515,10 @@ async function enterFromGate(){
     const snap=await db.collection('weeks').where('codeWord','==',code).limit(1).get();
     if(!snap.empty){
       const data=snap.docs[0].data();
-      const weekObj={id:snap.docs[0].id,code,name:data.label||data.name||('Week '+code),city:data.city||'',region:data.region||'',startDate:data.startDate||null,endDate:data.endDate||null,status:data.status||'active',followUpRecipients:data.followUpRecipients||[],followUpMode:data.followUpMode||'inapp',followUpFormUrl:data.followUpFormUrl||'',survey:data.survey||null,fromFirestore:true};
+      const weekObj={id:snap.docs[0].id,code,name:data.label||data.name||('Week '+code),label:data.label||data.name||('Week '+code),city:data.city||'',region:data.region||'',startDate:data.startDate||null,endDate:data.endDate||null,status:data.status||'active',followUpRecipients:data.followUpRecipients||[],followUpMode:data.followUpMode||'inapp',followUpFormUrl:data.followUpFormUrl||'',survey:data.survey||null,tallyFields:data.tallyFields||[],activeModules:data.activeModules||[],fromFirestore:true};
       const primary=(data.followUpRecipients||[]).find(r=>r.primary)||data.followUpRecipients?.[0];
       if(primary?.email){document.getElementById('email-to').value=primary.email;localStorage.setItem('gg_et',primary.email);}
-      ST8.currentWeek=weekObj;ST8.weeks=[weekObj];save();updateNav();dismissGate();
+      ST8.currentWeek=weekObj;ST8.weeks=[weekObj];save();renderTallyCounters();applyModuleVisibility();updateNav();dismissGate();
     }else{
       errEl.textContent='Code word not found. Please check with your team leader.';
       errEl.style.display='block';
@@ -1512,10 +1547,10 @@ async function setWeekFromCode(){
     const snap=await db.collection('weeks').where('codeWord','==',code).limit(1).get();
     if(!snap.empty){
       const data=snap.docs[0].data();
-      const weekObj={id:snap.docs[0].id,code,name:data.label||data.name||('Week '+code),city:data.city||'',region:data.region||'',startDate:data.startDate||null,endDate:data.endDate||null,status:data.status||'active',followUpRecipients:data.followUpRecipients||[],followUpMode:data.followUpMode||'inapp',followUpFormUrl:data.followUpFormUrl||'',survey:data.survey||null,fromFirestore:true};
+      const weekObj={id:snap.docs[0].id,code,name:data.label||data.name||('Week '+code),label:data.label||data.name||('Week '+code),city:data.city||'',region:data.region||'',startDate:data.startDate||null,endDate:data.endDate||null,status:data.status||'active',followUpRecipients:data.followUpRecipients||[],followUpMode:data.followUpMode||'inapp',followUpFormUrl:data.followUpFormUrl||'',survey:data.survey||null,tallyFields:data.tallyFields||[],activeModules:data.activeModules||[],fromFirestore:true};
       const primary=(data.followUpRecipients||[]).find(r=>r.primary)||data.followUpRecipients?.[0];
       if(primary?.email){document.getElementById('email-to').value=primary.email;localStorage.setItem('gg_et',primary.email);}
-      ST8.currentWeek=weekObj;ST8.weeks=[weekObj];save();updateNav();closeModal('week-modal');showToast('✅ Switched to: '+weekObj.name);
+      ST8.currentWeek=weekObj;ST8.weeks=[weekObj];save();renderTallyCounters();applyModuleVisibility();updateNav();closeModal('week-modal');showToast('✅ Switched to: '+weekObj.name);
     }else{
       showToast('Code word not found. Check with your team leader.');
     }
@@ -1610,7 +1645,7 @@ function submitTally(){
     const c = ST8.counters;
     const tallyDoc = {
       weekId:        wk.id,
-      weekName:      wk.name || '',
+      weekName:      wk.label || '',
       weekCode:      wk.code || '',
       city:          wk.city || '',
       submittedAt:   new Date().toISOString(),
@@ -1637,11 +1672,16 @@ function submitTally(){
       logistics:     gv('tally-logistics')|| ''
     };
     db.collection('tallies').add(tallyDoc)
-      .then(()=>showToast('Tally saved ✓'))
+      .then(() => {
+        for(const k in ST8.counters) ST8.counters[k] = 0;
+        updateCUI();
+        updateStats();
+        save();
+        renderTallyCounters();
+        showToast('Tally submitted ✓');
+      })
       .catch(e=>console.error('Tally write failed:',e));
   }
-
-  openEmailModal('tally');
 }
 
 // ─── Email ────────────────────────────────────────────────────────────────────
