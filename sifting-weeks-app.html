@@ -842,24 +842,24 @@ body{background:#0f2a40;color:#e8f0f8}
       <span class="tally-title">This Week's Count</span>
       <span class="tally-viewall" onclick="switchTab('summary');buildSummary()">Full summary →</span>
     </div>
-    <div class="tally-stats">
+    <div class="tally-stats" id="celebrate-stats-card">
       <div class="tally-stat">
-        <div class="tally-num" id="stat-gospel2">0</div>
+        <div class="tally-num">0</div>
         <div class="tally-lbl">Gospel</div>
       </div>
       <div class="tally-divider"></div>
       <div class="tally-stat">
-        <div class="tally-num" id="stat-pop2">0</div>
+        <div class="tally-num">0</div>
         <div class="tally-lbl">P.O.P.</div>
       </div>
       <div class="tally-divider"></div>
       <div class="tally-stat">
-        <div class="tally-num" id="stat-prayer2">0</div>
+        <div class="tally-num">0</div>
         <div class="tally-lbl">Prayer</div>
       </div>
       <div class="tally-divider"></div>
       <div class="tally-stat">
-        <div class="tally-num" id="stat-salvation2">0</div>
+        <div class="tally-num">0</div>
         <div class="tally-lbl">Decisions</div>
       </div>
     </div>
@@ -1514,16 +1514,21 @@ function updateStats() {
           });
         });
 
-        // Update Celebrate tab fixed stats
-        const elGospel2 = document.getElementById('stat-gospel2');
-        const elPop2 = document.getElementById('stat-pop2');
-        const elPrayer2 = document.getElementById('stat-prayer2');
-        const elSalvation2 = document.getElementById('stat-salvation2');
-        if (elGospel2) elGospel2.textContent = totals.gospel || 0;
-        if (elPop2) elPop2.textContent = totals.pop || 0;
-        if (elPrayer2) elPrayer2.textContent = totals.prayer || 0;
-        if (elSalvation2) elSalvation2.textContent =
-          (totals.salvations || 0) + (totals.pof || 0);
+        // Update Celebrate tab stats dynamically from week's tallyFields
+        const celebrateCard = document.getElementById('celebrate-stats-card');
+        if (celebrateCard && week.tallyFields) {
+          const activeFields = week.tallyFields.filter(f => f.active);
+          celebrateCard.innerHTML = activeFields.map(f => {
+            const val = totals[f.id] || 0;
+            return '<div class="tally-stat">' +
+              '<div class="tally-num">' + val + '</div>' +
+              '<div class="tally-lbl">' + f.label + '</div>' +
+              '</div>' +
+              '<div class="tally-divider"></div>';
+          }).join('');
+          const dividers = celebrateCard.querySelectorAll('.tally-divider');
+          if (dividers.length) dividers[dividers.length - 1].remove();
+        }
 
         // Update home screen stats dynamically from week's tallyFields
         const homeCard = document.getElementById('home-stats-card');
@@ -1706,7 +1711,7 @@ function submitTally(){
   const wk = ST8.currentWeek;
   if(wk && wk.id){
     const c = ST8.counters;
-    const tallyDoc = {
+    const baseDoc = {
       weekId:        wk.id,
       weekName:      wk.label || '',
       weekCode:      wk.code || '',
@@ -1718,15 +1723,6 @@ function submitTally(){
       submitterPhone: ST8.loggerPhone || '',
       teamName:      gv('tally-team') || '',
       area:          gv('tally-area') || '',
-      doors:         c.doors   || 0,
-      gospel:        c.gospel  || 0,
-      prayer:        c.prayer  || 0,
-      pop:           c.pop     || 0,
-      films:         c.films   || 0,
-      studies:       c.studies || 0,
-      salvations:    c.salvations || 0,
-      booklets:      c.booklets   || 0,
-      infocards:     c.infocards  || 0,
       spiritualAtm:  GS('spiritual-atm') || '',
       teamMorale:    GS('team-morale')   || '',
       story:         gv('tally-story')    || '',
@@ -1734,7 +1730,25 @@ function submitTally(){
       prayerReqs:    gv('tally-prayer')   || '',
       logistics:     gv('tally-logistics')|| ''
     };
-    db.collection('tallies').add(tallyDoc)
+
+    // Write all active tallyFields dynamically
+    const wkFields = wk.tallyFields || [];
+    wkFields.forEach(f => {
+      baseDoc[f.id] = ST8.counters[f.id] || 0;
+    });
+
+    // Also write legacy fields for backwards compatibility
+    baseDoc.gospel     = baseDoc.gospel     || c.gospel     || 0;
+    baseDoc.prayer     = baseDoc.prayer     || c.prayer     || 0;
+    baseDoc.salvations = baseDoc.salvations || c.salvations || 0;
+    baseDoc.pop        = baseDoc.pop        || c.pop        || 0;
+    baseDoc.doors      = baseDoc.doors      || c.doors      || 0;
+    baseDoc.films      = baseDoc.films      || c.films      || 0;
+    baseDoc.studies    = baseDoc.studies    || c.studies    || 0;
+    baseDoc.booklets   = baseDoc.booklets   || c.booklets   || 0;
+    baseDoc.infocards  = baseDoc.infocards  || c.infocards  || 0;
+
+    db.collection('tallies').add(baseDoc)
       .then(() => {
         for(const k in ST8.counters) ST8.counters[k] = 0;
         updateCUI();
