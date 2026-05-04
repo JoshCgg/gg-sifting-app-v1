@@ -1813,10 +1813,16 @@ async function buildSummary(){
     try {
       const snap = await db.collection('tallies').where('weekId', '==', weekId).get();
       if (!snap.empty) {
-        const TALLY_KEYS = ['doors','gospel','prayer','pop','films','studies','salvations','booklets','infocards','pof'];
+        // Build keys dynamically from week tallyFields + legacy fields
+        const weekTallyFields = (ST8.currentWeek.tallyFields || []);
+        const dynamicKeys = weekTallyFields.map(f => f.id);
+        const legacyKeys = ['doors','gospel','prayer','pop','films',
+          'studies','salvations','booklets','infocards','pof'];
+        const allKeys = [...new Set([...dynamicKeys, ...legacyKeys])];
+
         snap.forEach(d => {
           const data = d.data();
-          TALLY_KEYS.forEach(k => {
+          allKeys.forEach(k => {
             if (typeof data[k] === 'number') tallies[k] = (tallies[k] || 0) + data[k];
           });
         });
@@ -1834,7 +1840,17 @@ async function buildSummary(){
     tallies = { ...loc };
   }
 
-  const TALLY_LABELS = {
+  // Build label map dynamically from week tallyFields
+  const TALLY_LABELS = {};
+
+  // Add active week fields first (in config order)
+  const weekFields = ST8.currentWeek.tallyFields || [];
+  weekFields.forEach(f => {
+    TALLY_LABELS[f.id] = f.label;
+  });
+
+  // Add legacy labels as fallback for any fields not in tallyFields
+  const LEGACY_LABELS = {
     doors:      'Doors Knocked',
     gospel:     'Gospel Presentations',
     prayer:     'Prayer Conversations',
@@ -1846,8 +1862,11 @@ async function buildSummary(){
     booklets:   'Gospel Booklets / Tracts',
     infocards:  'Info Cards',
   };
+  Object.keys(LEGACY_LABELS).forEach(k => {
+    if (!TALLY_LABELS[k]) TALLY_LABELS[k] = LEGACY_LABELS[k];
+  });
 
-  // Only show rows with a value > 0
+  // Only show fields that have a value > 0
   const activeTallyKeys = Object.keys(TALLY_LABELS).filter(k => (tallies[k] || 0) > 0);
 
   const slv  = wc.filter(x => x.salvation === 'yes');
