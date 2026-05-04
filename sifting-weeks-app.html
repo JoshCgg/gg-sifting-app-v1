@@ -10,6 +10,7 @@
 <meta name="theme-color" content="#1B456A">
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <title>Global Gates — Sifting Week</title>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 <style>
@@ -1226,6 +1227,7 @@ window.onload = function() {
   };
   firebase.initializeApp(firebaseConfig);
   db = firebase.firestore();
+  window.auth = firebase.auth();
 
   // Boot
   loadState();
@@ -1312,6 +1314,12 @@ function applyModuleVisibility() {
 }
 
 function loadState(){
+  firebase.auth().onAuthStateChanged(user => {
+    if (!user && ST8.currentWeek && ST8.currentWeek.id) {
+      firebase.auth().signInAnonymously()
+        .catch(e => console.warn('Auth restore failed:', e));
+    }
+  });
   try{
     const s=JSON.parse(localStorage.getItem('gg_v3')||'{}');
     if(s.cw)ST8.currentWeek=s.cw;
@@ -1486,6 +1494,7 @@ function getCheckedTexts(cid){
 function AC(key,d){ST8.counters[key]=Math.max(0,(ST8.counters[key]||0)+d);updateCUI();save();}
 function updateCUI(){for(const k in ST8.counters){const e=document.getElementById('cnt-'+k);if(e)e.textContent=ST8.counters[k];}}
 function updateStats() {
+  console.log('updateStats called, weekId:', ST8.currentWeek && ST8.currentWeek.id);
   const week = ST8.currentWeek;
   if (!week || !week.id) {
     document.getElementById('stat-gospel').textContent = '0';
@@ -1506,6 +1515,7 @@ function updateStats() {
         prayer    += d.prayer              || 0;
         salvation += (d.salvations || d.pof || 0);
       });
+      console.log('Firestore stats result — gospel:', gospel, 'prayer:', prayer, 'salvation:', salvation);
       document.getElementById('stat-gospel').textContent    = gospel;
       document.getElementById('stat-pop').textContent       = pop;
       document.getElementById('stat-prayer').textContent    = prayer;
@@ -1536,11 +1546,14 @@ async function enterFromGate(){
     
     const snap=await db.collection('weeks').where('codeWord','==',code).limit(1).get();
     if(!snap.empty){
+      firebase.auth().signInAnonymously()
+        .then(() => console.log('Anonymous auth established'))
+        .catch(e => console.warn('Anonymous auth failed:', e));
       const data=snap.docs[0].data();
       const weekObj={id:snap.docs[0].id,code,name:data.label||data.name||('Week '+code),label:data.label||data.name||('Week '+code),city:data.city||'',region:data.region||'',startDate:data.startDate||null,endDate:data.endDate||null,status:data.status||'active',followUpRecipients:data.followUpRecipients||[],followUpMode:data.followUpMode||'inapp',followUpFormUrl:data.followUpFormUrl||'',survey:data.survey||null,tallyFields:data.tallyFields||[],activeModules:data.activeModules||[],fromFirestore:true};
       const primary=(data.followUpRecipients||[]).find(r=>r.primary)||data.followUpRecipients?.[0];
       if(primary?.email){document.getElementById('email-to').value=primary.email;localStorage.setItem('gg_et',primary.email);}
-      ST8.currentWeek=weekObj;ST8.weeks=[weekObj];save();renderTallyCounters();applyModuleVisibility();updateNav();dismissGate();
+      ST8.currentWeek=weekObj;ST8.weeks=[weekObj];save();renderTallyCounters();applyModuleVisibility();updateNav();updateStats();dismissGate();
     }else{
       errEl.textContent='Code word not found. Please check with your team leader.';
       errEl.style.display='block';
@@ -1568,11 +1581,14 @@ async function setWeekFromCode(){
     
     const snap=await db.collection('weeks').where('codeWord','==',code).limit(1).get();
     if(!snap.empty){
+      firebase.auth().signInAnonymously()
+        .then(() => console.log('Anonymous auth established'))
+        .catch(e => console.warn('Anonymous auth failed:', e));
       const data=snap.docs[0].data();
       const weekObj={id:snap.docs[0].id,code,name:data.label||data.name||('Week '+code),label:data.label||data.name||('Week '+code),city:data.city||'',region:data.region||'',startDate:data.startDate||null,endDate:data.endDate||null,status:data.status||'active',followUpRecipients:data.followUpRecipients||[],followUpMode:data.followUpMode||'inapp',followUpFormUrl:data.followUpFormUrl||'',survey:data.survey||null,tallyFields:data.tallyFields||[],activeModules:data.activeModules||[],fromFirestore:true};
       const primary=(data.followUpRecipients||[]).find(r=>r.primary)||data.followUpRecipients?.[0];
       if(primary?.email){document.getElementById('email-to').value=primary.email;localStorage.setItem('gg_et',primary.email);}
-      ST8.currentWeek=weekObj;ST8.weeks=[weekObj];save();renderTallyCounters();applyModuleVisibility();updateNav();closeModal('week-modal');showToast('✅ Switched to: '+weekObj.name);
+      ST8.currentWeek=weekObj;ST8.weeks=[weekObj];save();renderTallyCounters();applyModuleVisibility();updateNav();updateStats();closeModal('week-modal');showToast('✅ Switched to: '+weekObj.name);
     }else{
       showToast('Code word not found. Check with your team leader.');
     }
