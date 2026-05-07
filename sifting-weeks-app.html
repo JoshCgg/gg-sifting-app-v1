@@ -829,8 +829,10 @@ body{background:#0f2a40;color:#e8f0f8}
       <button onclick="closeModal('module-video-modal')" style="background:none;border:none;font-size:22px;color:#8a9aab;cursor:pointer;line-height:1;">✕</button>
     </div>
     <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;background:#000;">
-      <iframe id="video-modal-iframe" src="" frameborder="0" allowfullscreen
-        style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe>
+      <iframe id="video-modal-iframe" src="" frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen webkitallowfullscreen mozallowfullscreen
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;"></iframe>
     </div>
     <div style="padding:16px 20px;">
       <div style="font-size:13px;color:#7a8fa0;line-height:1.5" id="video-modal-caption"></div>
@@ -1120,7 +1122,14 @@ function handleFollowUpTap(){
 }
 
 // ─── UI Helpers ───────────────────────────────────────────────────────────────
-function toggleRC(card){card.querySelector('.rc-body').classList.toggle('open');}
+function toggleRC(card){
+  const body = card.querySelector('.rc-body');
+  const isOpen = body.classList.contains('open');
+  // Close all open cards first
+  document.querySelectorAll('.rc-body.open').forEach(b => b.classList.remove('open'));
+  // If it wasn't open before, open it now
+  if (!isOpen) body.classList.add('open');
+}
 function toggleCheck(item){
   const b=item.querySelector('.chb'),t=item.querySelector('.cht');
   b.classList.toggle('ck');t.classList.toggle('ck');
@@ -1683,6 +1692,8 @@ function renderModulesToTabs(modules, activeModules) {
   activeModules.forEach(slug => {
     const m = modules[slug];
     if (!m) return;
+    // prayer-guide is handled by the hardcoded widget — skip dynamic rendering
+    if (slug === 'prayer-guide') return;
     if (slug.startsWith('devotion-')) {
       devotionSlugs.push({ slug, m });
     } else if (m.tab === 'prepare') {
@@ -1735,10 +1746,13 @@ function buildModuleCard(slug, m) {
     'korbani': '🐑', 'prayer-walking': '🚶', 'holy-spirit': '⚡',
     'prayer-guide': '📅', 'devotional': '📖', 'vision-foundations': '🌍',
     'spiritual-prep': '🛡️', 'my-story': '📝', 'cultural': '🕌',
+    'devotion-day1': '📖', 'devotion-day2': '🌍', 'devotion-day3': '🏙️',
+    'devotion-day4': '✉️',
   };
+  const tabIcons = { prepare: '📖', pray: '🙏', share: '🌍' };
   const colorClass = ['', 'i', 'o', 'm', 'g'];
   const colorIdx = Math.abs(slug.split('').reduce((a, c) => a + c.charCodeAt(0), 0)) % colorClass.length;
-  const icon = icons[slug] || '📄';
+  const icon = icons[slug] || tabIcons[m.tab] || '📄';
   const color = colorClass[colorIdx];
 
   if (m.type === 'video') {
@@ -1792,7 +1806,15 @@ function openExternalModal(title, desc, url) {
 }
 
 function openExternalLink() {
-  if (_currentExternalUrl) window.open(_currentExternalUrl, '_blank');
+  if (_currentExternalUrl) {
+    const a = document.createElement('a');
+    a.href = _currentExternalUrl;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
   closeModal('module-external-modal');
 }
 
