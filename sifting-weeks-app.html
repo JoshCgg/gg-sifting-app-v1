@@ -1656,7 +1656,7 @@ async function loadAndRenderModules() {
   try {
     // Fetch all active modules in one query
     const snap = await db.collection('modules')
-      .where('status', 'in', ['global', 'active'])
+      .where('status', '==', 'global')
       .get();
 
     const modules = {};
