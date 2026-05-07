@@ -1641,6 +1641,18 @@ async function loadAndRenderModules() {
     return;
   }
 
+  // Wait for auth before querying
+  await new Promise(resolve => {
+    const unsub = firebase.auth().onAuthStateChanged(user => {
+      unsub();
+      if (!user) {
+        firebase.auth().signInAnonymously().then(resolve).catch(resolve);
+      } else {
+        resolve();
+      }
+    });
+  });
+
   try {
     // Fetch all active modules in one query
     const snap = await db.collection('modules')
