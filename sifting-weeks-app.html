@@ -87,6 +87,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bright-gray);color:var
 .rc-body ul, .rc-body ol{padding-left:20px;margin:8px 0 8px 8px;}
 .rc-body li{margin-bottom:6px;}
 .rc-body ol{list-style-position:inside;padding-left:0;margin-left:0;}
+.rc-images{margin-top:12px;}
+.rc-img-caption{font-size:12px;color:#888;text-align:center;margin:0 0 12px 0;}
 .scr{background:var(--gbl2);border-left:3px solid var(--gbj);padding:10px 14px;border-radius:6px;font-style:italic;color:var(--gid);margin:10px 0;font-size:13px}
 .fg{margin-bottom:14px}
 .fl{font-size:12px;font-weight:600;color:var(--gi);display:block;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px}
@@ -1784,11 +1786,16 @@ function buildModuleCard(slug, m) {
   }
 
   // Written content — expandable card
+  const imagesHtml = (m.images && m.images.length)
+    ? `<div class="rc-images">${m.images.map(img =>
+        `<img src="${escapeAttr(img.url || '')}" style="width:100%;border-radius:6px;margin-bottom:4px;">${img.caption ? `<p class="rc-img-caption">${escHtml(img.caption)}</p>` : ''}`
+      ).join('')}</div>`
+    : '';
   return `<div class="rc ${color}" onclick="toggleRC(this)">
     <div class="rc-icon">${icon}</div>
     <div class="rc-title">${escHtml(m.title)}</div>
     <div class="rc-desc">${escHtml(m.description || '')}</div>
-    <div class="rc-body">${m.body || '<p>No content yet.</p>'}</div>
+    <div class="rc-body">${m.body || '<p>No content yet.</p>'}${imagesHtml}</div>
   </div>`;
 }
 
