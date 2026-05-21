@@ -1326,6 +1326,7 @@ function submitContact(){
 
 async function saveContactToFirestore(c){
   try{
+    console.log('loggedBy debug:', document.getElementById('logger-name')?.value, ST8.loggerName);
     await db.collection('contacts').add({
       weekId:c.weekId||null,codeWord:c.week,submittedAt:firebase.firestore.FieldValue.serverTimestamp(),
       name:c.name,language:c.lang||'',religion:c.religion||'',gender:c.gender||'',
