@@ -1338,7 +1338,8 @@ async function saveContactToFirestore(c){
       followUpTime:c.followupTime||'',popIndicators:c.popIndicators,
       scripture:c.scripture||'',family:c.family||'',atmosphere:c.atmosphere||'',
       notes:c.notes||'',prayerRequests:c.prayerReq||'',
-      followUpSentTo:c.followUpSentTo,clientDate:c.date,clientTime:c.time,localId:String(c.id)
+      followUpSentTo:c.followUpSentTo,clientDate:c.date,clientTime:c.time,localId:String(c.id),
+      loggedBy:ST8.loggerName||''
     });
   }catch(err){console.warn('Firestore write failed (saved locally):',err.message);}
 }
