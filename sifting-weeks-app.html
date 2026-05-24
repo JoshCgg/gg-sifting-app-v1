@@ -511,6 +511,11 @@ body{background:#0f2a40;color:#e8f0f8}
       </div>
       <div class="fu-divider"></div>
       <div class="fu-field">
+        <label class="fl">Neighborhood/Location <span style="color:red">*</span></label>
+        <input type="text" class="fi" id="contact-location" placeholder="e.g. 72nd &amp; Roosevelt, Apt 3B" required>
+      </div>
+      <div class="fu-divider"></div>
+      <div class="fu-field">
         <label class="fl">Encounter Type</label>
         <div class="tg" id="encounter-type">
           <div class="to" data-val="door-to-door" onclick="ST(this,'encounter-type')">Door-to-door</div>
@@ -1298,6 +1303,7 @@ function submitContact(){
   const name=gv('contact-name')||'Unnamed person';
   const happened=GS('what-happened');
   if(!happened){showToast('Select what happened');return;}
+  if(!gv('contact-location').trim()){showToast('Location of meeting is required.');return;}
   const c={
     id:Date.now(),week:ST8.currentWeek.code,weekId:ST8.currentWeek.id||null,name,
     type:GS('encounter-type'),religion:GS('religion'),lang:gv('contact-lang'),gender:GS('gender'),
@@ -1329,7 +1335,7 @@ async function saveContactToFirestore(c){
 await db.collection('contacts').add({
       weekId:c.weekId||null,codeWord:c.week,submittedAt:firebase.firestore.FieldValue.serverTimestamp(),
       name:c.name,language:c.lang||'',religion:c.religion||'',gender:c.gender||'',
-      encounterType:c.type||'',neighborhood:c.location||'',phone:c.contactInfo||'',
+      encounterType:c.type||'',location:c.location||'',neighborhood:c.location||'',phone:c.contactInfo||'',
       gospelShared:c.happened==='shared-gospel',
       prayedWith:c.happened==='prayed-together'||c.gospelResponse==='green',
       salvation:c.salvation||'no',gospelResponse:c.response||'',
@@ -1648,7 +1654,7 @@ function showInstall(){document.getElementById('install-modal').classList.add('s
 function showToast(msg){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
+  setTimeout(()=>t.classList.remove('show'),6000);
 }
 // ─── Dynamic Module Rendering ─────────────────────────────────────────────────
 
