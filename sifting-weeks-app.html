@@ -707,6 +707,9 @@ body{background:#0f2a40;color:#e8f0f8}
       </div>
     </div>
 
+    <div id="survey-scroll-hint" style="position:sticky;bottom:0;background:linear-gradient(transparent,var(--indigo) 40%);padding:16px;margin:0 -16px;text-align:center;pointer-events:none;">
+      <span style="color:white;font-size:13px;font-family:Montserrat,sans-serif;opacity:0.9;">▼ Scroll to submit</span>
+    </div>
     <button class="bp" style="background:var(--orange);border-radius:12px;font-family:var(--font-display);font-size:16px;margin-bottom:8px" onclick="submitSurvey()">Submit Reflection</button>
     <button class="bs" onclick="switchTab('celebrate')" style="margin-bottom:24px">Cancel</button>
   </div>
@@ -1004,6 +1007,7 @@ function save(){
 
 // ─── Navigation ───────────────────────────────────────────────────────────────
 function switchTab(tab){
+  if(window._surveyInProgress && !confirm("You haven't submitted your survey yet — your answers will be lost. Leave anyway?")) return;
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('screen-'+tab).classList.add('active');
@@ -1020,6 +1024,8 @@ function handleSurveyTap(){
   } else {
     switchTab('feedback');
     buildSurveyPrayerUpdates();
+    window._surveyInProgress = true;
+    window.onbeforeunload = function() { return "You haven't submitted your survey yet. Are you sure you want to leave?"; };
   }
 }
 
@@ -1057,6 +1063,7 @@ function toggleSurveyPartnership(el, type){
 }
 
 async function submitSurvey(){
+  window._surveyInProgress = false;
   var name = gv('survey-name');
   var email = gv('survey-email');
   if(!name){ showToast('Please enter your name'); return; }
@@ -1116,7 +1123,11 @@ async function submitSurvey(){
   btn.textContent = 'Submitting...';
 
   try {
+    window._surveyInProgress = false;
+    window.onbeforeunload = null;
     await db.collection('surveyResponses').add(surveyData);
+    window._surveyInProgress = false;
+    window.onbeforeunload = null;
     document.getElementById('survey-form-view').style.display = 'none';
     document.getElementById('survey-success-view').style.display = 'block';
     window.scrollTo(0,0);
@@ -1861,6 +1872,21 @@ document.querySelectorAll('.mo').forEach(o=>o.addEventListener('click',function(
     if(iframe){const src=iframe.src;iframe.src='';iframe.src=src;}
   }
 }));
+
+document.addEventListener('DOMContentLoaded', function(){
+  var hint = document.getElementById('survey-scroll-hint');
+  var submitBtn = document.querySelector('#survey-form-view .bp');
+  if(!hint || !submitBtn) return;
+  window.addEventListener('scroll', function(){
+    var btnRect = submitBtn.getBoundingClientRect();
+    var viewHeight = window.innerHeight;
+    if(btnRect.top < viewHeight - 20){
+      hint.style.display = 'none';
+    } else {
+      hint.style.display = 'block';
+    }
+  });
+});
 
 
 
