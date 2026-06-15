@@ -619,13 +619,13 @@ body{background:#0f2a40;color:#e8f0f8}
     <div class="card" style="padding:0;overflow:hidden;margin-bottom:12px">
 
       <div class="fu-field">
-        <label class="fl">Your Name</label>
+        <label class="fl">Your Name<span style="color:#F38E53;margin-left:3px;">*</span></label>
         <input type="text" class="fi" id="survey-name" placeholder="First and last name">
       </div>
       <div class="fu-divider"></div>
 
       <div class="fu-field">
-        <label class="fl">Your Email</label>
+        <label class="fl">Your Email<span style="color:#F38E53;margin-left:3px;">*</span></label>
         <input type="email" class="fi" id="survey-email" placeholder="your@email.com">
       </div>
       <div class="fu-divider"></div>
@@ -689,7 +689,7 @@ body{background:#0f2a40;color:#e8f0f8}
     </div>
 
     <div class="card" style="margin-bottom:12px">
-      <div style="font-size:12px;font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">I would like to partner with Global Gates by:</div>
+      <div style="font-size:12px;font-weight:700;color:var(--bright-gray);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">I would like to partner with Global Gates by:</div>
       <div id="survey-partnership-list">
         <div class="chi" onclick="toggleSurveyPartnership(this,'prayer')" id="survey-prayer-row"><div class="chb"></div><div class="cht">Praying with you. Please send updates to my email above from the following workers.</div></div>
         <div id="survey-prayer-workers-card" style="display:none;margin-left:20px;margin-top:8px;margin-bottom:4px;padding:10px 12px;background:var(--bright-gray);border-radius:10px;border-left:3px solid var(--blue-jeans)">
@@ -708,7 +708,7 @@ body{background:#0f2a40;color:#e8f0f8}
     </div>
 
     <div id="survey-scroll-hint" style="display:none;position:fixed;bottom:0;left:0;right:0;background:linear-gradient(transparent,#1B456A 50%);padding:20px 16px 16px;text-align:center;pointer-events:none;z-index:999;">
-      <span style="color:white;font-size:13px;font-family:Montserrat,sans-serif;font-weight:600;">▼ Scroll to submit</span>
+      <span style="color:#F38E53;font-size:14px;font-family:Montserrat,sans-serif;font-weight:700;letter-spacing:1px;">▼ Scroll to submit</span>
     </div>
     <button class="bp" style="background:var(--orange);border-radius:12px;font-family:var(--font-display);font-size:16px;margin-bottom:8px" onclick="submitSurvey()">Submit Reflection</button>
     <button class="bs" onclick="switchTab('celebrate')" style="margin-bottom:24px">Cancel</button>
